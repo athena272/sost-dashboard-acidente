@@ -1,0 +1,12 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: sost-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - sost_mongo_data:/data/db
+    restart: unless-stopped
+
+volumes:
+  sost_mongo_data:
