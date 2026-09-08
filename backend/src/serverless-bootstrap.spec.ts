@@ -41,4 +41,13 @@ describe('serverless reflect-metadata bootstrap', () => {
     expect(serverlessSrc).toMatch(/cachedServer\s*\?\?=/);
     expect(serverlessSrc).toContain('cachedServer = undefined');
   });
+
+  it('asserts Mongo URI before Nest init on serverless', () => {
+    expect(serverlessSrc).toContain('assertMongoUriForRuntime');
+  });
+
+  it('returns JSON 500 with CORS headers when bootstrap throws', () => {
+    expect(apiHandlerSrc).toContain('sendBootstrapError');
+    expect(apiHandlerSrc).toContain('Access-Control-Allow-Origin');
+  });
 });
