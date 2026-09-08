@@ -1,4 +1,5 @@
 import { useId, type InputHTMLAttributes, type ReactNode } from 'react';
+import { requiredFieldMarker } from './requiredFieldMarker';
 
 export type FieldBaseProps = {
   id?: string;
@@ -31,7 +32,9 @@ export function FieldShell({
     <div className={`field${error ? ' field-has-error' : ''}`}>
       <label htmlFor={id}>
         {label}
-        {required ? <span className="field-required"> *</span> : null}
+        {required ? (
+          <span className="field-required">{requiredFieldMarker(true)}</span>
+        ) : null}
       </label>
       {children}
       {hint && !error ? (
