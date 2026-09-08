@@ -15,7 +15,7 @@ A planilha legada em `spreadsheet/` serve apenas para o **seed inicial**. Depois
 
 ## Pré-requisitos
 
-- Node.js 20+
+- Node.js 24+
 - pnpm 11+
 - Docker (só para o banco local)
 
@@ -120,6 +120,8 @@ Com o MongoDB do Docker ativo (usa o database `sost-dashboard-test`):
 pnpm test
 ```
 
+CI no GitHub Actions (`.github/workflows/ci.yml`) roda em **Node.js 24**, sobe MongoDB como service container, executa testes e build do frontend.
+
 ## Estrutura
 
 ```
@@ -127,9 +129,11 @@ backend/         API NestJS (local: main.ts | Vercel: api/index.ts)
 frontend/        App React
 shared/          Tipos/labels compartilhados
 spreadsheet/     Planilha fonte do seed
+.github/         Workflows de CI
 ```
 
 ## Observações
 
 - Siglas na interface aparecem com significado entre parênteses (ex.: `CID (Classificação Internacional de Doenças)`).
 - A aba estatística lateral da planilha **não** é replicada: o dashboard calcula agregações a partir dos registros.
+- No dashboard, “Como chegamos nisto” mostra a trilha de cálculo, os buckets da API e os registros brutos que compõem cada métrica.
