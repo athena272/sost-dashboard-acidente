@@ -1,5 +1,13 @@
 import { Type } from 'class-transformer';
-import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import {
+  IsDateString,
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 import { AccidentType } from '@sost/shared';
 
 export class QueryAccidentsDto {
@@ -24,6 +32,14 @@ export class QueryAccidentsDto {
   @Type(() => Number)
   @IsInt()
   year?: number;
+
+  @IsOptional()
+  @IsDateString()
+  accidentDateFrom?: string;
+
+  @IsOptional()
+  @IsDateString()
+  accidentDateTo?: string;
 
   @IsOptional()
   @IsEnum(AccidentType)
