@@ -2,10 +2,10 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
   "installCommand": "cd .. && pnpm install",
-  "buildCommand": "cd .. && pnpm --filter @sost/shared build && pnpm --filter @sost/backend build",
+  "buildCommand": "cd .. && pnpm --filter @sost/shared build && pnpm --filter @sost/backend build && node backend/scripts/vendor-shared-for-vercel.cjs",
   "functions": {
     "api/index.js": {
-      "includeFiles": "dist/**",
+      "includeFiles": "{dist/**,node_modules/@sost/shared/**}",
       "maxDuration": 10
     }
   },
