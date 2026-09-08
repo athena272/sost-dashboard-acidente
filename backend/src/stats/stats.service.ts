@@ -13,8 +13,13 @@ export const STATS_CHART_BUCKET_LIMIT = 10;
 
 export type StatsDimension = StatsContributorDimension;
 
-export type ContributorsQuery = {
+export type YearFilterInput = {
   year?: number;
+  yearFrom?: number;
+  yearTo?: number;
+};
+
+export type ContributorsQuery = YearFilterInput & {
   dimension: StatsDimension;
   key?: string;
   page?: number;
@@ -40,14 +45,45 @@ export class StatsService {
     private readonly accidentModel: Model<AccidentDocument>,
   ) {}
 
-  private match(year?: number): FilterQuery<AccidentDocument> {
-    return year ? { emissionYear: year } : {};
+  private normalizeYearFilter(input?: YearFilterInput): YearFilterInput {
+    const year = input?.year;
+    let yearFrom = input?.yearFrom;
+    let yearTo = input?.yearTo;
+
+    if (yearFrom != null || yearTo != null) {
+      if (yearFrom != null && yearTo != null && yearFrom > yearTo) {
+        const swap = yearFrom;
+        yearFrom = yearTo;
+        yearTo = swap;
+      }
+      return { yearFrom, yearTo };
+    }
+
+    return { year };
   }
 
-  private async groupBy(field: string, year?: number, limit = STATS_API_BUCKET_LIMIT) {
+  private match(input?: YearFilterInput): FilterQuery<AccidentDocument> {
+    const filter = this.normalizeYearFilter(input);
+    if (filter.yearFrom != null || filter.yearTo != null) {
+      const emissionYear: { $gte?: number; $lte?: number } = {};
+      if (filter.yearFrom != null) emissionYear.$gte = filter.yearFrom;
+      if (filter.yearTo != null) emissionYear.$lte = filter.yearTo;
+      return { emissionYear };
+    }
+    if (filter.year != null) {
+      return { emissionYear: filter.year };
+    }
+    return {};
+  }
+
+  private async groupBy(
+    field: string,
+    yearFilter?: YearFilterInput,
+    limit = STATS_API_BUCKET_LIMIT,
+  ) {
     return this.accidentModel
       .aggregate([
-        { $match: this.match(year) },
+        { $match: this.match(yearFilter) },
         {
           $group: {
             _id: `$${field}`,
@@ -68,23 +104,33 @@ export class StatsService {
       .exec();
   }
 
-  private async countDistinct(field: string, year?: number) {
+  private async countDistinct(field: string, yearFilter?: YearFilterInput) {
     const values = await this.accidentModel
       .distinct(field, {
-        ...this.match(year),
+        ...this.match(yearFilter),
         [field]: { $nin: [null, ''] },
       })
       .exec();
     return values.length;
   }
 
-  private buildMeta(year?: number) {
-    const yearFilter = year
-      ? `Somente registros com ano de emissão ${year}`
-      : 'Todos os anos de emissão (sem filtro de ano)';
+  private buildMeta(input?: YearFilterInput) {
+    const filter = this.normalizeYearFilter(input);
+    let yearFilter: string;
+    if (filter.yearFrom != null || filter.yearTo != null) {
+      const from = filter.yearFrom ?? '…';
+      const to = filter.yearTo ?? '…';
+      yearFilter = `Registros com ano de emissão de ${from} até ${to}`;
+    } else if (filter.year != null) {
+      yearFilter = `Somente registros com ano de emissão ${filter.year}`;
+    } else {
+      yearFilter = 'Todos os anos de emissão (sem filtro de ano)';
+    }
 
     return {
-      year: year ?? null,
+      year: filter.year ?? null,
+      yearFrom: filter.yearFrom ?? null,
+      yearTo: filter.yearTo ?? null,
       yearFilter,
       formula:
         'Cada registro de CAT que atende ao critério soma 1 na quantidade',
@@ -112,8 +158,37 @@ export class StatsService {
     };
   }
 
-  async overview(year?: number) {
-    const match = this.match(year);
+  async emissionYearBounds() {
+    const currentYear = new Date().getFullYear();
+    const [result] = await this.accidentModel
+      .aggregate<{ minYear: number | null; maxYear: number | null }>([
+        { $match: { emissionYear: { $type: 'number' } } },
+        {
+          $group: {
+            _id: null,
+            minYear: { $min: '$emissionYear' },
+            maxYear: { $max: '$emissionYear' },
+          },
+        },
+      ])
+      .exec();
+
+    const minYear = result?.minYear ?? currentYear;
+    return {
+      minYear,
+      maxYear: currentYear,
+      latestRecordYear: result?.maxYear ?? null,
+    };
+  }
+
+  private toYearFilter(input?: number | YearFilterInput): YearFilterInput {
+    if (typeof input === 'number') return { year: input };
+    return input ?? {};
+  }
+
+  async overview(input?: number | YearFilterInput) {
+    const yearFilter = this.toYearFilter(input);
+    const match = this.match(yearFilter);
     const [
       total,
       byMonth,
@@ -150,14 +225,14 @@ export class StatsService {
           },
         ])
         .exec(),
-      this.groupBy('role', year),
-      this.groupBy('cid', year),
-      this.groupBy('accidentType', year),
-      this.groupBy('sector', year),
-      this.groupBy('bodyPart', year),
-      this.groupBy('sex', year),
-      this.countDistinct('accidentType', year),
-      this.countDistinct('cid', year),
+      this.groupBy('role', yearFilter),
+      this.groupBy('cid', yearFilter),
+      this.groupBy('accidentType', yearFilter),
+      this.groupBy('sector', yearFilter),
+      this.groupBy('bodyPart', yearFilter),
+      this.groupBy('sex', yearFilter),
+      this.countDistinct('accidentType', yearFilter),
+      this.countDistinct('cid', yearFilter),
     ]);
 
     return {
@@ -171,13 +246,13 @@ export class StatsService {
       bySex,
       distinctTypes,
       distinctCids,
-      meta: this.buildMeta(year),
+      meta: this.buildMeta(yearFilter),
     };
   }
 
   private contributorsFilter(query: ContributorsQuery): FilterQuery<AccidentDocument> {
     const filter: FilterQuery<AccidentDocument> = {
-      ...this.match(query.year),
+      ...this.match(query),
     };
 
     if (query.dimension === 'total') {
@@ -217,6 +292,7 @@ export class StatsService {
   async contributors(query: ContributorsQuery) {
     const page = query.page ?? 1;
     const limit = Math.min(query.limit ?? 20, 100);
+    const yearFilter = this.normalizeYearFilter(query);
     const filter = this.contributorsFilter(query);
 
     const [items, total] = await Promise.all([
@@ -240,7 +316,9 @@ export class StatsService {
       limit,
       totalPages: Math.ceil(total / limit) || 1,
       filter: {
-        year: query.year ?? null,
+        year: yearFilter.year ?? null,
+        yearFrom: yearFilter.yearFrom ?? null,
+        yearTo: yearFilter.yearTo ?? null,
         dimension: query.dimension,
         key: query.key ?? null,
       },

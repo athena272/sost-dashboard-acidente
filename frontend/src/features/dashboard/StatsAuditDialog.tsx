@@ -29,11 +29,11 @@ type ContributorsResponse = {
 type Props = {
   open: boolean;
   trail: StatsAuditTrail | null;
-  year: string;
+  yearQuery: string;
   onClose: () => void;
 };
 
-export function StatsAuditDialog({ open, trail, year, onClose }: Props) {
+export function StatsAuditDialog({ open, trail, yearQuery, onClose }: Props) {
   const [selectedKey, setSelectedKey] = useState('');
   const [data, setData] = useState<ContributorsResponse | null>(null);
   const [page, setPage] = useState(1);
@@ -82,7 +82,10 @@ export function StatsAuditDialog({ open, trail, year, onClose }: Props) {
       page: String(page),
       limit: '15',
     });
-    if (year) params.set('year', year);
+    if (yearQuery) {
+      const yearParams = new URLSearchParams(yearQuery);
+      yearParams.forEach((value, key) => params.set(key, value));
+    }
     if (trail.dimension !== 'total') {
       params.set('key', requestKey);
     }
@@ -103,7 +106,7 @@ export function StatsAuditDialog({ open, trail, year, onClose }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [open, trail, requestKey, page, year]);
+  }, [open, trail, requestKey, page, yearQuery]);
 
   if (!open || !trail) return null;
 

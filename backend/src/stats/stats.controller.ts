@@ -1,57 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { Type } from 'class-transformer';
-import {
-  IsIn,
-  IsInt,
-  IsOptional,
-  IsString,
-  Max,
-  Min,
-} from 'class-validator';
-import { StatsDimension, StatsService } from './stats.service';
-
-class StatsQueryDto {
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  year?: number;
-}
-
-class ContributorsQueryDto {
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  year?: number;
-
-  @IsIn([
-    'total',
-    'role',
-    'cid',
-    'accidentType',
-    'sector',
-    'bodyPart',
-    'sex',
-    'month',
-  ])
-  dimension!: StatsDimension;
-
-  @IsOptional()
-  @IsString()
-  key?: string;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  page?: number;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  @Max(100)
-  limit?: number;
-}
+import { ContributorsQueryDto } from './dto/contributors-query.dto';
+import { StatsQueryDto } from './dto/stats-query.dto';
+import { StatsService } from './stats.service';
 
 @Controller('stats')
 export class StatsController {
@@ -59,11 +9,20 @@ export class StatsController {
 
   @Get('overview')
   overview(@Query() query: StatsQueryDto) {
-    return this.statsService.overview(query.year);
+    return this.statsService.overview({
+      year: query.year,
+      yearFrom: query.yearFrom,
+      yearTo: query.yearTo,
+    });
   }
 
   @Get('contributors')
   contributors(@Query() query: ContributorsQueryDto) {
     return this.statsService.contributors(query);
+  }
+
+  @Get('emission-year-bounds')
+  emissionYearBounds() {
+    return this.statsService.emissionYearBounds();
   }
 }
