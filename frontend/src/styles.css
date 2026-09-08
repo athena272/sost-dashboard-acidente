@@ -332,6 +332,12 @@ th {
   cursor: not-allowed;
 }
 
+.btn.active-filter {
+  border-color: var(--brand);
+  color: var(--brand);
+  background: rgba(11, 95, 107, 0.08);
+}
+
 .kpi-head {
   display: flex;
   justify-content: space-between;
