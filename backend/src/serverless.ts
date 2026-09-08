@@ -18,7 +18,7 @@ let cachedServer: Promise<Express> | undefined;
 async function createServer(): Promise<Express> {
   assertMongoUriForRuntime();
   const expressApp = express();
-  const nestApp = await createNestApp(expressApp);
+  const nestApp = await createNestApp(expressApp, { bufferLogs: true });
   await nestApp.init();
   return expressApp;
 }
