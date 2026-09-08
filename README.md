@@ -109,7 +109,9 @@ O `frontend/vercel.json` já define install/build com o monorepo + `shared`.
 
 O `backend/vercel.json` builda `shared` + Nest (`tsc`). O handler `api/index.js` (JavaScript puro) carrega `dist/serverless` para preservar metadados de decorator; `public/` é só a página estática mínima exigida pela Vercel sem framework.
 
-Se o login no frontend falhar com **CORS / Failed to fetch**, confira primeiro os **logs da função** no projeto da API: muitas vezes a causa real é `FUNCTION_INVOCATION_FAILED` (ex.: falta de `reflect-metadata` no bootstrap, ou `MONGODB_URI`/`JWT_SECRET` inválidos). Sem resposta bem-sucedida do Nest, o browser não vê `Access-Control-Allow-Origin` e reporta CORS.
+Se o login no frontend falhar com **CORS / Failed to fetch**, confira primeiro os **logs da função** no projeto da API: muitas vezes a causa real é `FUNCTION_INVOCATION_FAILED` (bootstrap Nest, `@sost/shared` ausente no bundle, ou `MONGODB_URI`/`JWT_SECRET` inválidos). Sem resposta bem-sucedida do Nest, o browser não vê `Access-Control-Allow-Origin` e reporta CORS.
+
+O build da API na Vercel roda `vendor-shared-for-vercel.cjs` para copiar `@sost/shared` para dentro de `backend/node_modules` (o symlink pnpm aponta para fora do Root Directory e não entra no bundle da função). Confirme `MONGODB_URI` do Atlas (não localhost) nas env vars de Production.
 
 ### MongoDB Atlas
 
