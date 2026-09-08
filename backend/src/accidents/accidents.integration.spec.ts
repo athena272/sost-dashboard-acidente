@@ -118,5 +118,43 @@ describe('AccidentsService + StatsService (integration)', () => {
       dimension: 'total',
     });
     expect(totals.total).toBe(2);
+
+    await accidentsService.create({
+      victimName: 'C',
+      role: 'Médica',
+      emissionYear: 2023,
+      accidentType: AccidentType.Typical,
+      cid: 'S62',
+      accidentDate: '2023-06-01',
+    });
+    await accidentsService.create({
+      victimName: 'D',
+      role: 'Médica',
+      emissionYear: 2024,
+      accidentType: AccidentType.Typical,
+      cid: 'S62',
+      accidentDate: '2024-06-01',
+    });
+
+    const ranged = await statsService.overview({
+      yearFrom: 2023,
+      yearTo: 2024,
+    });
+    expect(ranged.total).toBe(2);
+    expect(ranged.meta.yearFrom).toBe(2023);
+    expect(ranged.meta.yearTo).toBe(2024);
+    expect(ranged.meta.yearFilter).toContain('2023');
+    expect(ranged.meta.yearFilter).toContain('2024');
+
+    const rangedContributors = await statsService.contributors({
+      yearFrom: 2023,
+      yearTo: 2024,
+      dimension: 'total',
+    });
+    expect(rangedContributors.total).toBe(2);
+
+    const bounds = await statsService.emissionYearBounds();
+    expect(bounds.minYear).toBe(2023);
+    expect(bounds.maxYear).toBe(new Date().getFullYear());
   });
 });
