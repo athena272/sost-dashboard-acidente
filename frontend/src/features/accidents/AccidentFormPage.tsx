@@ -1,18 +1,18 @@
-import type { FormEvent } from 'react';
-import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { acronymLabel } from '@sost/shared';
-import { api } from '../../lib/api';
-import { useAuth } from '../auth/AuthContext';
-import { AccidentFormFields } from './AccidentFormFields';
+import type { FormEvent } from "react";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { acronymLabel } from "@sost/shared";
+import { api } from "../../lib/api";
+import { useAuth } from "../auth/AuthContext";
+import { AccidentFormFields } from "./AccidentFormFields";
 import {
   Accident,
   accidentToForm,
   emptyForm,
   formToPayload,
   AccidentFormValues,
-} from './types';
-import { validateAccidentForm } from './validateAccidentForm';
+} from "./types";
+import { validateAccidentForm } from "./validateAccidentForm";
 
 export function AccidentFormPage() {
   const { id } = useParams();
@@ -22,7 +22,7 @@ export function AccidentFormPage() {
   const readOnly = isEdit && !canWriteAccidents;
   const [form, setForm] = useState<AccidentFormValues>(emptyForm());
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
 
@@ -30,14 +30,14 @@ export function AccidentFormPage() {
     if (!id) return;
     api<Accident>(`/accidents/${id}`)
       .then((accident) => setForm(accidentToForm(accident)))
-      .catch((err) => setError(err instanceof Error ? err.message : 'Erro'))
+      .catch((err) => setError(err instanceof Error ? err.message : "Erro"))
       .finally(() => setLoading(false));
   }, [id]);
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     if (readOnly) return;
-    setError('');
+    setError("");
     const validation = validateAccidentForm(form);
     if (!validation.ok) {
       setFieldErrors(validation.fieldErrors);
@@ -50,18 +50,18 @@ export function AccidentFormPage() {
       const payload = formToPayload(form);
       if (isEdit && id) {
         await api(`/accidents/${id}`, {
-          method: 'PATCH',
+          method: "PATCH",
           body: JSON.stringify(payload),
         });
       } else {
-        await api('/accidents', {
-          method: 'POST',
+        await api("/accidents", {
+          method: "POST",
           body: JSON.stringify(payload),
         });
       }
-      navigate('/accidents');
+      navigate("/accidents");
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Falha ao salvar');
+      setError(err instanceof Error ? err.message : "Falha ao salvar");
     } finally {
       setSaving(false);
     }
@@ -73,13 +73,13 @@ export function AccidentFormPage() {
     <form className="stack" onSubmit={onSubmit} noValidate>
       <div>
         <h1>
-          {readOnly ? 'Detalhes' : isEdit ? 'Editar' : 'Novo'} registro de{' '}
-          {acronymLabel('CAT')}
+          {readOnly ? "Detalhes" : isEdit ? "Editar" : "Novo"} registro de{" "}
+          {acronymLabel("CAT")}
         </h1>
         <p className="muted">
           {readOnly
-            ? `Consulta do registro (perfil Visualizador não altera ${acronymLabel('CAT')}).`
-            : `Cadastro organizado de acidentes do ${acronymLabel('SOST')}. Campos marcados com * são obrigatórios.`}
+            ? `Consulta do registro (perfil Visualizador não altera ${acronymLabel("CAT")}).`
+            : `Cadastro organizado de acidentes do ${acronymLabel("SOST")}. Campos marcados como (obrigatório) precisam ser preenchidos.`}
         </p>
       </div>
       <fieldset className="card form-fieldset" disabled={readOnly}>
@@ -89,7 +89,7 @@ export function AccidentFormPage() {
             setForm(next);
             if (Object.keys(fieldErrors).length > 0) {
               setFieldErrors({});
-              setError('');
+              setError("");
             }
           }}
           errors={fieldErrors}
@@ -99,11 +99,11 @@ export function AccidentFormPage() {
       <div className="actions">
         {readOnly ? null : (
           <button className="btn" type="submit" disabled={saving}>
-            {saving ? 'Salvando…' : 'Salvar'}
+            {saving ? "Salvando…" : "Salvar"}
           </button>
         )}
         <Link className="btn secondary" to="/accidents">
-          {readOnly ? 'Voltar' : 'Cancelar'}
+          {readOnly ? "Voltar" : "Cancelar"}
         </Link>
       </div>
     </form>
