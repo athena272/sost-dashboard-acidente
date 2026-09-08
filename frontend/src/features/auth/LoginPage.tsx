@@ -1,12 +1,13 @@
 import type { FormEvent } from 'react';
 import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { acronymLabel } from '@sost/shared';
+import { PasswordField } from '../../components/PasswordField';
 import { useAuth } from './AuthContext';
 
 export function LoginPage() {
   const { user, login, loading } = useAuth();
-  const [username, setUsername] = useState('admin');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -45,21 +46,20 @@ export function LoginPage() {
             required
           />
         </div>
-        <div className="field">
-          <label htmlFor="password">Senha</label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete="current-password"
-            required
-          />
-        </div>
+        <PasswordField
+          label="Senha"
+          value={password}
+          onChange={setPassword}
+          autoComplete="current-password"
+          required
+        />
         {error ? <p className="error">{error}</p> : null}
         <button className="btn" type="submit" disabled={submitting}>
           {submitting ? 'Entrando…' : 'Entrar'}
         </button>
+        <p className="muted">
+          Ainda não tem conta? <Link to="/register">Cadastre-se</Link>
+        </p>
       </form>
     </div>
   );
