@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "ts-node -r tsconfig-paths/register src/main.ts",
+    "dev": "nest start --watch",
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/main.js",
+    "start:ts": "ts-node -r tsconfig-paths/register src/main.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "seed": "ts-node -r tsconfig-paths/register src/seed/seed-accidents.cli.ts",
