@@ -1,16 +1,23 @@
-# Documentação de deploy e lições aprendidas
+# Documentação de deploy, domínio e lições aprendidas
 
-Esta pasta guarda o **caminho das pedras** do deploy deste monorepo (Nest + pnpm + Vercel + MongoDB Atlas + Vite), para não repetir os mesmos incidentes em projetos futuros.
+Esta pasta guarda o **caminho das pedras** do deploy deste monorepo (Nest + pnpm + Vercel + MongoDB Atlas + Vite), para não repetir os mesmos incidentes em projetos futuros, e também **decisões de domínio** que não devem ser reabertas sem contexto.
 
-O [`README.md`](../README.md) na raiz continua **operacional** (como subir local e envs). Aqui ficam **arquitetura**, **checklist** e **post-mortems** por tema.
+O [`README.md`](../README.md) na raiz continua **operacional** (como subir local e envs). Aqui ficam **arquitetura**, **checklist**, **post-mortems** e **domínio** por tema.
 
 ## Como usar
 
 1. Novo projeto Nest monorepo na Vercel? Comece pelo [checklist](deploy/checklist-proximo-projeto.md).
 2. Erro estranho no browser/logs? Veja [sintoma → causa](deploy/sintoma-para-causa.md).
-3. Quer o “porquê” de uma decisão? Leia o incidente correspondente em `incidentes/`.
+3. Quer o “porquê” de uma decisão de deploy? Leia o incidente correspondente em `incidentes/`.
+4. Dúvida sobre campos/enums de acidente? Veja [domínio](dominio/selects-acidente.md).
 
 ## Índice
+
+### Domínio
+
+| Arquivo | Conteúdo |
+|---------|----------|
+| [selects-acidente.md](dominio/selects-acidente.md) | Tipo do acidente / Situação como enums fechados (sem CRUD); fontes Lei 8.213 e eSocial `tpAcid` |
 
 ### Deploy
 
