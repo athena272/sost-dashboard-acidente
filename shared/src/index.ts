@@ -138,3 +138,51 @@ export const ACTIVITY_ACTION_LABELS: Record<ActivityAction, string> = {
   [ActivityAction.EditorRequestReject]: "Rejeição de solicitação",
   [ActivityAction.EditorRequestCancel]: "Cancelamento de solicitação",
 };
+
+export type StatsContributorDimension =
+  | "total"
+  | "role"
+  | "cid"
+  | "accidentType"
+  | "sector"
+  | "bodyPart"
+  | "sex"
+  | "month";
+
+const MONTH_KEY_PATTERN = /^(\d{4})-(\d{2})$/;
+
+/** Evita misturar chave de uma dimensão com outra (ex.: "typical" em month). */
+export function isContributorKeyCompatible(
+  dimension: StatsContributorDimension,
+  key: string | undefined | null,
+): boolean {
+  if (dimension === "total") return true;
+  const value = key?.trim() ?? "";
+  if (!value) return false;
+  if (dimension === "month") {
+    const match = MONTH_KEY_PATTERN.exec(value);
+    if (!match) return false;
+    const month = Number(match[2]);
+    return month >= 1 && month <= 12;
+  }
+  return true;
+}
+
+export function parseMonthContributorKey(key: string): {
+  year: number;
+  month: number;
+} {
+  const value = key.trim();
+  const match = MONTH_KEY_PATTERN.exec(value);
+  if (!match) {
+    throw new Error(
+      'Para consultar por mês, use o formato AAAA-MM (ex.: "2025-03")',
+    );
+  }
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  if (month < 1 || month > 12) {
+    throw new Error("Mês inválido: use um valor entre 01 e 12");
+  }
+  return { year, month };
+}
