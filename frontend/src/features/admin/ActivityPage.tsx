@@ -76,7 +76,8 @@ export function ActivityPage() {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Usuário, ação, entidade…"
+            placeholder="Digite usuário, ação ou entidade"
+            aria-label="Buscar no histórico de atividades"
           />
         </div>
         <div className="field">
