@@ -3,13 +3,12 @@
   "framework": null,
   "installCommand": "cd .. && pnpm install",
   "buildCommand": "cd .. && pnpm --filter @sost/shared build && pnpm --filter @sost/backend build",
-  "outputDirectory": null,
-  "rewrites": [{ "source": "/(.*)", "destination": "/api" }],
   "functions": {
-    "api/index.ts": {
+    "api/index.js": {
       "includeFiles": "dist/**",
       "memory": 1024,
       "maxDuration": 10
     }
-  }
+  },
+  "rewrites": [{ "source": "/(.*)", "destination": "/api" }]
 }
