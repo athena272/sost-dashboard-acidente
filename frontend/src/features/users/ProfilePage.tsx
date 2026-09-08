@@ -7,7 +7,11 @@ import {
   ROLE_LABELS,
   UserRole,
 } from '@sost/shared';
+import { TextAreaField } from '../../components/forms/TextAreaField';
+import { TextField } from '../../components/forms/TextField';
 import { api } from '../../lib/api';
+import { getZodFieldErrors } from '../../lib/formErrors';
+import { profileSchema } from '../../lib/formSchemas';
 import { useAuth } from '../auth/AuthContext';
 
 type EditorRequest = {
@@ -25,6 +29,7 @@ export function ProfilePage() {
   const [pending, setPending] = useState<EditorRequest | null>(null);
   const [error, setError] = useState('');
   const [info, setInfo] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
 
   async function loadRequests() {
@@ -48,13 +53,19 @@ export function ProfilePage() {
 
   async function onSaveProfile(event: FormEvent) {
     event.preventDefault();
-    setSaving(true);
     setError('');
     setInfo('');
+    const parsed = profileSchema.safeParse({ name });
+    if (!parsed.success) {
+      setFieldErrors(getZodFieldErrors(parsed.error));
+      return;
+    }
+    setFieldErrors({});
+    setSaving(true);
     try {
       await api('/users/me', {
         method: 'PATCH',
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({ name: parsed.data.name }),
       });
       await refreshMe();
       setInfo('Perfil atualizado.');
@@ -98,19 +109,23 @@ export function ProfilePage() {
         <p className="muted">{ROLE_DESCRIPTIONS[user.role]}</p>
       </div>
 
-      <form className="card stack" onSubmit={onSaveProfile}>
-        <div className="field">
-          <label htmlFor="profile-username">Usuário</label>
-          <input id="profile-username" value={user.username} disabled />
-        </div>
-        <div className="field">
-          <label htmlFor="profile-name">Nome</label>
-          <input
-            id="profile-name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </div>
+      <form className="card stack" onSubmit={onSaveProfile} noValidate>
+        <TextField
+          id="profile-username"
+          label="Usuário"
+          value={user.username}
+          onChange={() => undefined}
+          disabled
+          ariaLabel="Usuário (somente leitura)"
+        />
+        <TextField
+          id="profile-name"
+          label="Nome"
+          value={name}
+          onChange={setName}
+          placeholder="Digite seu nome completo"
+          error={fieldErrors.name}
+        />
         <button className="btn" type="submit" disabled={saving}>
           {saving ? 'Salvando…' : 'Salvar perfil'}
         </button>
@@ -153,16 +168,15 @@ export function ProfilePage() {
             </div>
           ) : (
             <div className="stack">
-              <div className="field">
-                <label htmlFor="request-message">Mensagem (opcional)</label>
-                <textarea
-                  id="request-message"
-                  rows={3}
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Ex.: preciso registrar CATs do meu setor"
-                />
-              </div>
+              <TextAreaField
+                id="request-message"
+                label="Mensagem (opcional)"
+                value={message}
+                onChange={setMessage}
+                rows={3}
+                placeholder="Digite uma mensagem para o administrador, se desejar. Ex.: preciso registrar CATs do meu setor"
+                ariaLabel="Mensagem opcional para solicitar perfil de editor"
+              />
               <button className="btn" type="button" onClick={() => void requestEditor()}>
                 Solicitar perfil de Editor de registros
               </button>
