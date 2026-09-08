@@ -170,6 +170,14 @@ h3 {
   border-color: var(--brand);
 }
 
+.field input:disabled,
+.field select:disabled,
+.field textarea:disabled {
+  cursor: not-allowed;
+  background: var(--bg-accent);
+  color: var(--muted);
+}
+
 .field-invalid {
   border-color: var(--danger) !important;
 }

@@ -19,6 +19,15 @@ export const profileSchema = z.object({
   name: z.string().trim().max(120, 'Nome muito longo').optional(),
 });
 
+export const editorRequestSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(2, 'Informe o nome completo (mínimo 2 caracteres)')
+    .max(120, 'Nome muito longo'),
+  message: z.string().trim().max(500, 'Mensagem muito longa').optional(),
+});
+
 const requiredText = (message: string) =>
   z.string().trim().min(1, message);
 
@@ -67,4 +76,5 @@ export const accidentFormSchema = z.object({
 export type LoginValues = z.infer<typeof loginSchema>;
 export type RegisterValues = z.infer<typeof registerSchema>;
 export type ProfileValues = z.infer<typeof profileSchema>;
+export type EditorRequestValues = z.infer<typeof editorRequestSchema>;
 export type AccidentFormSchemaValues = z.infer<typeof accidentFormSchema>;

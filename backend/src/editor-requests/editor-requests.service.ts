@@ -18,7 +18,21 @@ export class EditorRequestsService {
     private readonly usersService: UsersService,
   ) {}
 
-  async create(userId: string, username: string, role: UserRole, message?: string) {
+  private normalizeName(name: string) {
+    const trimmed = name?.trim() ?? '';
+    if (trimmed.length < 2) {
+      throw new BadRequestException('Informe o nome completo');
+    }
+    return trimmed;
+  }
+
+  async create(
+    userId: string,
+    username: string,
+    role: UserRole,
+    name: string,
+    message?: string,
+  ) {
     if (role !== UserRole.Viewer) {
       throw new BadRequestException(
         'Apenas Visualizadores podem solicitar o perfil de Editor de registros',
@@ -26,11 +40,17 @@ export class EditorRequestsService {
     }
 
     const existing = await this.requestModel
-      .findOne({ userId: new Types.ObjectId(userId), status: EditorRequestStatus.Pending })
+      .findOne({
+        userId: new Types.ObjectId(userId),
+        status: EditorRequestStatus.Pending,
+      })
       .exec();
     if (existing) {
       throw new ConflictException('Já existe uma solicitação pendente');
     }
+
+    const normalizedName = this.normalizeName(name);
+    await this.usersService.updateProfile(userId, normalizedName);
 
     return this.requestModel.create({
       userId: new Types.ObjectId(userId),
@@ -38,6 +58,28 @@ export class EditorRequestsService {
       status: EditorRequestStatus.Pending,
       message: message?.trim() || undefined,
     });
+  }
+
+  async updatePending(
+    requestId: string,
+    userId: string,
+    name: string,
+    message?: string,
+  ) {
+    const request = await this.requestModel.findById(requestId).exec();
+    if (!request) throw new NotFoundException('Solicitação não encontrada');
+    if (String(request.userId) !== userId) {
+      throw new BadRequestException('Só é possível editar a própria solicitação');
+    }
+    if (request.status !== EditorRequestStatus.Pending) {
+      throw new BadRequestException('Só é possível editar solicitações pendentes');
+    }
+
+    const normalizedName = this.normalizeName(name);
+    await this.usersService.updateProfile(userId, normalizedName);
+    request.message = message?.trim() || undefined;
+    await request.save();
+    return request;
   }
 
   async findMine(userId: string) {
@@ -50,7 +92,10 @@ export class EditorRequestsService {
 
   async findPendingMine(userId: string) {
     return this.requestModel
-      .findOne({ userId: new Types.ObjectId(userId), status: EditorRequestStatus.Pending })
+      .findOne({
+        userId: new Types.ObjectId(userId),
+        status: EditorRequestStatus.Pending,
+      })
       .lean()
       .exec();
   }
@@ -58,7 +103,12 @@ export class EditorRequestsService {
   async findAll(status?: EditorRequestStatus) {
     const filter: FilterQuery<EditorRequestDocument> = {};
     if (status) filter.status = status;
-    return this.requestModel.find(filter).sort({ createdAt: -1 }).lean().exec();
+    return this.requestModel
+      .find(filter)
+      .populate('userId', 'name username')
+      .sort({ createdAt: -1 })
+      .lean()
+      .exec();
   }
 
   async countPending() {

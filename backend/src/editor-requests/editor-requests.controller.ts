@@ -3,30 +3,20 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { IsEnum, IsOptional, IsString, MaxLength } from 'class-validator';
-import { ActivityAction, EditorRequestStatus, UserRole } from '@sost/shared';
+import { ActivityAction, UserRole } from '@sost/shared';
 import { ActivityLogsService } from '../activity-logs/activity-logs.service';
 import { CurrentUser, type AuthUser } from '../auth/current-user.decorator';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
+import { CreateEditorRequestDto } from './dto/create-editor-request.dto';
+import { QueryEditorRequestsDto } from './dto/query-editor-requests.dto';
+import { UpdatePendingEditorRequestDto } from './dto/update-pending-editor-request.dto';
 import { EditorRequestsService } from './editor-requests.service';
-
-class CreateEditorRequestDto {
-  @IsOptional()
-  @IsString()
-  @MaxLength(500)
-  message?: string;
-}
-
-class QueryEditorRequestsDto {
-  @IsOptional()
-  @IsEnum(EditorRequestStatus)
-  status?: EditorRequestStatus;
-}
 
 @Controller()
 @UseGuards(RolesGuard)
@@ -45,6 +35,7 @@ export class EditorRequestsController {
       user.userId,
       user.username,
       user.role,
+      dto.name,
       dto.message,
     );
     await this.activityLogs.record({
@@ -53,9 +44,23 @@ export class EditorRequestsController {
       entityId: String(request.id),
       actorUserId: user.userId,
       actorUsername: user.username,
-      details: { message: dto.message },
+      details: { message: dto.message, name: dto.name },
     });
     return request;
+  }
+
+  @Patch('editor-requests/:id')
+  async updatePending(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthUser,
+    @Body() dto: UpdatePendingEditorRequestDto,
+  ) {
+    return this.editorRequestsService.updatePending(
+      id,
+      user.userId,
+      dto.name,
+      dto.message,
+    );
   }
 
   @Get('editor-requests/me')
@@ -115,7 +120,8 @@ export class EditorRequestsController {
   @Get('notifications/summary')
   @Roles(UserRole.Admin)
   async notificationsSummary() {
-    const pendingEditorRequests = await this.editorRequestsService.countPending();
+    const pendingEditorRequests =
+      await this.editorRequestsService.countPending();
     return { pendingEditorRequests };
   }
 }
