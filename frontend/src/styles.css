@@ -331,3 +331,68 @@ th {
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+.kpi-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.kpi-head h2 {
+  margin: 0;
+}
+
+.audit-btn {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(21, 32, 43, 0.45);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  z-index: 50;
+}
+
+.dialog {
+  width: min(960px, 100%);
+  max-height: min(90vh, 900px);
+  overflow: auto;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.audit-trail {
+  margin: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.audit-trail-item {
+  display: grid;
+  gap: 0.2rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.audit-trail-item dt {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.audit-trail-item dd {
+  margin: 0;
+  color: var(--muted);
+}
