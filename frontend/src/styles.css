@@ -203,6 +203,7 @@ h3 {
 
 .field-required {
   color: var(--danger);
+  font-weight: 900;
 }
 
 .btn {
