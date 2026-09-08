@@ -1,13 +1,14 @@
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { acronymLabel } from '@sost/shared';
+import { acronymLabel, ROLE_DESCRIPTIONS, ROLE_LABELS, UserRole } from '@sost/shared';
 import { PasswordField } from '../../components/PasswordField';
 import { useAuth } from './AuthContext';
 
-export function LoginPage() {
-  const { user, login, loading } = useAuth();
+export function RegisterPage() {
+  const { user, register, loading } = useAuth();
   const [username, setUsername] = useState('');
+  const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -19,9 +20,13 @@ export function LoginPage() {
     setSubmitting(true);
     setError('');
     try {
-      await login(username, password);
+      await register({
+        username,
+        password,
+        name: name.trim() || undefined,
+      });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Falha no login');
+      setError(err instanceof Error ? err.message : 'Falha no cadastro');
     } finally {
       setSubmitting(false);
     }
@@ -31,10 +36,20 @@ export function LoginPage() {
     <div className="login-page">
       <form className="card login-card stack" onSubmit={onSubmit}>
         <div>
-          <h1>{acronymLabel('SOST')}</h1>
+          <h1>Criar conta</h1>
           <p className="muted">
-            Dashboard de acidentes — acesso com usuário e senha.
+            A conta nasce como <strong>{ROLE_LABELS[UserRole.Viewer]}</strong>:{' '}
+            {ROLE_DESCRIPTIONS[UserRole.Viewer]}
           </p>
+        </div>
+        <div className="field">
+          <label htmlFor="name">Nome (opcional)</label>
+          <input
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            autoComplete="name"
+          />
         </div>
         <div className="field">
           <label htmlFor="username">Usuário</label>
@@ -43,6 +58,7 @@ export function LoginPage() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             autoComplete="username"
+            minLength={3}
             required
           />
         </div>
@@ -50,15 +66,21 @@ export function LoginPage() {
           label="Senha"
           value={password}
           onChange={setPassword}
-          autoComplete="current-password"
+          autoComplete="new-password"
           required
+          minLength={6}
         />
+        <p className="muted">
+          Depois, no perfil, você pode solicitar o perfil de{' '}
+          {ROLE_LABELS[UserRole.Editor]} se precisar cadastrar ou alterar{' '}
+          {acronymLabel('CAT')}.
+        </p>
         {error ? <p className="error">{error}</p> : null}
         <button className="btn" type="submit" disabled={submitting}>
-          {submitting ? 'Entrando…' : 'Entrar'}
+          {submitting ? 'Cadastrando…' : 'Cadastrar'}
         </button>
         <p className="muted">
-          Ainda não tem conta? <Link to="/register">Cadastre-se</Link>
+          Já tem conta? <Link to="/login">Entrar</Link>
         </p>
       </form>
     </div>

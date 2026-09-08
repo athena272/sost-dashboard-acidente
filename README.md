@@ -72,6 +72,20 @@ pnpm run dev:web    # terminal 3 — frontend
 
 - Usuário: `admin`
 - Senha: `admin123`
+- Perfil: **Administrador** (único; criado no bootstrap)
+
+## Perfis de acesso
+
+| Perfil (UI) | Código | Poderes |
+| --- | --- | --- |
+| Visualizador | `viewer` | Consulta dashboard, lista, filtros e detalhes. Sem criar/editar/excluir. |
+| Editor de registros | `editor` | Tudo do Visualizador + CRUD de acidentes (CATs). |
+| Administrador | `admin` | Tudo do Editor + usuários, pedidos de editor e histórico de atividades. |
+
+- Cadastro público (`/register`) sempre cria **Visualizador**.
+- Visualizador pode solicitar **Editor de registros** em **Perfil**; o admin aprova em **Pedidos**.
+- A API **não** promove ninguém a Administrador; só troca Visualizador ↔ Editor de registros.
+- Histórico de atividades e listagem de usuários são exclusivos do admin.
 
 ## Deploy na Vercel (grátis)
 

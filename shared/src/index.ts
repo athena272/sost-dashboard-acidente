@@ -69,3 +69,72 @@ export const ACCIDENT_STATUS_LABELS: Record<AccidentStatus, string> = {
   [AccidentStatus.PartiallyAttended]: "Atendida em parte",
   [AccidentStatus.Unknown]: "Não informado",
 };
+
+export enum UserRole {
+  Viewer = "viewer",
+  Editor = "editor",
+  Admin = "admin",
+}
+
+export const ROLE_LABELS: Record<UserRole, string> = {
+  [UserRole.Viewer]: "Visualizador",
+  [UserRole.Editor]: "Editor de registros",
+  [UserRole.Admin]: "Administrador",
+};
+
+export const ROLE_DESCRIPTIONS: Record<UserRole, string> = {
+  [UserRole.Viewer]:
+    "Pode consultar o dashboard, listar, filtrar, buscar e abrir detalhes dos acidentes. Não cadastra, não edita e não exclui registros.",
+  [UserRole.Editor]:
+    "Além de consultar (como o Visualizador), pode cadastrar, editar e excluir acidentes (CATs).",
+  [UserRole.Admin]:
+    "Tudo do Editor de registros, e ainda gerencia usuários, aprova pedidos de edição e vê o histórico de atividades.",
+};
+
+export function canWriteAccidents(role: UserRole): boolean {
+  return role === UserRole.Editor || role === UserRole.Admin;
+}
+
+export function isAdmin(role: UserRole): boolean {
+  return role === UserRole.Admin;
+}
+
+export enum EditorRequestStatus {
+  Pending = "pending",
+  Approved = "approved",
+  Rejected = "rejected",
+  Cancelled = "cancelled",
+}
+
+export const EDITOR_REQUEST_STATUS_LABELS: Record<EditorRequestStatus, string> = {
+  [EditorRequestStatus.Pending]: "Pendente",
+  [EditorRequestStatus.Approved]: "Aprovado",
+  [EditorRequestStatus.Rejected]: "Rejeitado",
+  [EditorRequestStatus.Cancelled]: "Cancelado",
+};
+
+export enum ActivityAction {
+  AuthLogin = "auth.login",
+  AuthRegister = "auth.register",
+  AccidentCreate = "accident.create",
+  AccidentUpdate = "accident.update",
+  AccidentDelete = "accident.delete",
+  UserRoleChange = "user.role_change",
+  EditorRequestCreate = "editor_request.create",
+  EditorRequestApprove = "editor_request.approve",
+  EditorRequestReject = "editor_request.reject",
+  EditorRequestCancel = "editor_request.cancel",
+}
+
+export const ACTIVITY_ACTION_LABELS: Record<ActivityAction, string> = {
+  [ActivityAction.AuthLogin]: "Login",
+  [ActivityAction.AuthRegister]: "Cadastro de usuário",
+  [ActivityAction.AccidentCreate]: "Criação de acidente",
+  [ActivityAction.AccidentUpdate]: "Edição de acidente",
+  [ActivityAction.AccidentDelete]: "Exclusão de acidente",
+  [ActivityAction.UserRoleChange]: "Alteração de perfil",
+  [ActivityAction.EditorRequestCreate]: "Solicitação de editor",
+  [ActivityAction.EditorRequestApprove]: "Aprovação de solicitação",
+  [ActivityAction.EditorRequestReject]: "Rejeição de solicitação",
+  [ActivityAction.EditorRequestCancel]: "Cancelamento de solicitação",
+};
