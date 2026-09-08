@@ -5,7 +5,12 @@ import {
   ROLE_LABELS,
   UserRole,
 } from '@sost/shared';
+import { ClearFiltersButton } from '../../components/ClearFiltersButton';
 import { api } from '../../lib/api';
+import {
+  DEFAULT_ADMIN_REQUESTS_STATUS,
+  buildAdminRequestsParams,
+} from './adminRequestsFilters';
 
 type PopulatedUser = {
   _id?: string;
@@ -31,16 +36,15 @@ function applicantName(item: EditorRequest) {
 
 export function AdminRequestsPage() {
   const [items, setItems] = useState<EditorRequest[]>([]);
-  const [status, setStatus] = useState<string>(EditorRequestStatus.Pending);
+  const [status, setStatus] = useState<string>(DEFAULT_ADMIN_REQUESTS_STATUS);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
-  async function load() {
+  async function load(nextStatus = status) {
     setLoading(true);
     setError('');
     try {
-      const params = new URLSearchParams();
-      if (status) params.set('status', status);
+      const params = buildAdminRequestsParams(nextStatus);
       const result = await api<EditorRequest[]>(`/editor-requests?${params}`);
       setItems(result);
     } catch (err) {
@@ -54,6 +58,10 @@ export function AdminRequestsPage() {
     void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
+
+  function clearFilters() {
+    setStatus(DEFAULT_ADMIN_REQUESTS_STATUS);
+  }
 
   async function approve(id: string) {
     await api(`/editor-requests/${id}/approve`, { method: 'POST' });
@@ -76,24 +84,31 @@ export function AdminRequestsPage() {
       </div>
 
       <div className="card toolbar">
-        <div className="field">
-          <label>Status</label>
-          <select value={status} onChange={(e) => setStatus(e.target.value)}>
-            <option value="">Todos</option>
-            {Object.values(EditorRequestStatus).map((value) => (
-              <option key={value} value={value}>
-                {EDITOR_REQUEST_STATUS_LABELS[value]}
-              </option>
-            ))}
-          </select>
+        <div className="toolbar-controls">
+          <div className="field">
+            <label htmlFor="admin-requests-status">Status</label>
+            <select
+              id="admin-requests-status"
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+            >
+              <option value="">Todos</option>
+              {Object.values(EditorRequestStatus).map((value) => (
+                <option key={value} value={value}>
+                  {EDITOR_REQUEST_STATUS_LABELS[value]}
+                </option>
+              ))}
+            </select>
+          </div>
+          <button
+            className="btn secondary"
+            type="button"
+            onClick={() => void load()}
+          >
+            Atualizar
+          </button>
+          <ClearFiltersButton onClick={clearFilters} />
         </div>
-        <button
-          className="btn secondary"
-          type="button"
-          onClick={() => void load()}
-        >
-          Atualizar
-        </button>
       </div>
 
       {error ? <p className="error">{error}</p> : null}
