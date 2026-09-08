@@ -81,7 +81,7 @@ export const emptyForm = (): AccidentFormValues => ({
   accidentTime: '',
   bodyPart: '',
   causingAgent: '',
-  accidentType: AccidentType.Typical,
+  accidentType: '',
   cid: '',
   daysOff: '',
   destinationSector: '',
