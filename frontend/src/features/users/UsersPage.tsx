@@ -87,7 +87,7 @@ export function UsersPage() {
       <div className="card toolbar">
         <div className="field">
           <label>Busca</label>
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Usuário ou nome" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Digite o usuário ou o nome" aria-label="Buscar por usuário ou nome" />
         </div>
         <div className="field">
           <label>Perfil</label>
