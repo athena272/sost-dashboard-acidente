@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { clampPage, getVisiblePages } from './paginationRange';
+import {
+  clampPage,
+  formatPaginationSummary,
+  getVisiblePages,
+} from './paginationRange';
 
 describe('clampPage', () => {
   it('keeps a page inside the valid range', () => {
@@ -92,5 +96,19 @@ describe('getVisiblePages', () => {
       'ellipsis',
       20,
     ]);
+  });
+});
+
+describe('formatPaginationSummary', () => {
+  it('formats the shared summary copy', () => {
+    expect(formatPaginationSummary(371, 'registro(s)', 1, 25)).toBe(
+      '371 registro(s) — página 1 de 25',
+    );
+  });
+
+  it('clamps page and totalPages in the summary text', () => {
+    expect(formatPaginationSummary(10, 'usuário(s)', 0, 0)).toBe(
+      '10 usuário(s) — página 1 de 1',
+    );
   });
 });
