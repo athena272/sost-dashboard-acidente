@@ -3,5 +3,9 @@ packages:
   - "backend"
   - "shared"
 
+# Evita dual Express 4+5 (Nest platform-express puxa 5; backend antigo puxava 4 → app.router crash na Vercel)
+overrides:
+  express: "^5.2.1"
+
 allowBuilds:
   esbuild: true
