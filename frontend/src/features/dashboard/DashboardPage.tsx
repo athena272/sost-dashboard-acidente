@@ -11,51 +11,18 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import {
-  ACCIDENT_TYPE_LABELS,
-  AccidentType,
-  SEX_LABELS,
-  Sex,
-  acronymLabel,
-} from '@sost/shared';
+import { acronymLabel } from '@sost/shared';
 import { api } from '../../lib/api';
-
-type Bucket = { key: string; count: number };
-type MonthBucket = { year: number; month: number; count: number };
-
-type Overview = {
-  total: number;
-  byMonth: MonthBucket[];
-  byRole: Bucket[];
-  byCid: Bucket[];
-  byType: Bucket[];
-  bySector: Bucket[];
-  byBodyPart: Bucket[];
-  bySex: Bucket[];
-};
-
-const MONTHS = [
-  'Jan',
-  'Fev',
-  'Mar',
-  'Abr',
-  'Mai',
-  'Jun',
-  'Jul',
-  'Ago',
-  'Set',
-  'Out',
-  'Nov',
-  'Dez',
-];
-
-function labelType(key: string) {
-  return ACCIDENT_TYPE_LABELS[key as AccidentType] ?? key;
-}
-
-function labelSex(key: string) {
-  return SEX_LABELS[key as Sex] ?? key;
-}
+import { StatsAuditButton, StatsAuditDialog } from './StatsAuditDialog';
+import {
+  buildStatsAuditTrail,
+  labelSex,
+  labelType,
+  monthLabel,
+  type Overview,
+  type StatsAuditMetric,
+  type StatsAuditTrail,
+} from './statsAuditTrail';
 
 export function DashboardPage() {
   const currentYear = new Date().getFullYear();
@@ -63,6 +30,8 @@ export function DashboardPage() {
   const [data, setData] = useState<Overview | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const [auditTrail, setAuditTrail] = useState<StatsAuditTrail | null>(null);
+  const [auditOpen, setAuditOpen] = useState(false);
 
   async function load(selectedYear: string) {
     setLoading(true);
@@ -82,9 +51,15 @@ export function DashboardPage() {
     void load(year);
   }, [year]);
 
+  function openAudit(metric: StatsAuditMetric) {
+    if (!data) return;
+    setAuditTrail(buildStatsAuditTrail(metric, data));
+    setAuditOpen(true);
+  }
+
   const monthSeries =
     data?.byMonth.map((item) => ({
-      label: `${MONTHS[item.month - 1]}/${item.year}`,
+      label: monthLabel(item.year, item.month),
       count: item.count,
     })) ?? [];
 
@@ -94,7 +69,8 @@ export function DashboardPage() {
         <h1>Dashboard — {acronymLabel('SOST')}</h1>
         <p className="muted">
           Evolução mensal de acidentes, funções, {acronymLabel('CID')} e tipos
-          (típico / trajeto / doença ocupacional).
+          (típico / trajeto / doença ocupacional). Use “Como chegamos nisto”
+          para ver a trilha de cálculo e os registros brutos.
         </p>
       </div>
 
@@ -118,22 +94,34 @@ export function DashboardPage() {
       {data ? (
         <>
           <div className="grid-3">
-            <div className="card">
-              <div className="muted">Total de registros</div>
+            <div className="card stack">
+              <div className="kpi-head">
+                <div className="muted">Total de registros</div>
+                <StatsAuditButton onClick={() => openAudit('total')} />
+              </div>
               <div className="stat">{data.total}</div>
             </div>
-            <div className="card">
-              <div className="muted">Tipos distintos</div>
-              <div className="stat">{data.byType.length}</div>
+            <div className="card stack">
+              <div className="kpi-head">
+                <div className="muted">Tipos distintos</div>
+                <StatsAuditButton onClick={() => openAudit('distinctTypes')} />
+              </div>
+              <div className="stat">{data.distinctTypes}</div>
             </div>
-            <div className="card">
-              <div className="muted">{acronymLabel('CID')} distintos</div>
-              <div className="stat">{data.byCid.length}</div>
+            <div className="card stack">
+              <div className="kpi-head">
+                <div className="muted">{acronymLabel('CID')} distintos</div>
+                <StatsAuditButton onClick={() => openAudit('distinctCids')} />
+              </div>
+              <div className="stat">{data.distinctCids}</div>
             </div>
           </div>
 
-          <div className="card">
-            <h2>Evolução mês a mês</h2>
+          <div className="card stack">
+            <div className="kpi-head">
+              <h2>Evolução mês a mês</h2>
+              <StatsAuditButton onClick={() => openAudit('byMonth')} />
+            </div>
             <div style={{ width: '100%', height: 280 }}>
               <ResponsiveContainer>
                 <LineChart data={monthSeries}>
@@ -158,10 +146,12 @@ export function DashboardPage() {
             <ChartCard
               title="Por função"
               data={data.byRole.map((i) => ({ name: i.key, count: i.count }))}
+              onAudit={() => openAudit('byRole')}
             />
             <ChartCard
               title={`Por ${acronymLabel('CID')}`}
               data={data.byCid.map((i) => ({ name: i.key, count: i.count }))}
+              onAudit={() => openAudit('byCid')}
             />
             <ChartCard
               title="Por tipo de acidente"
@@ -169,10 +159,12 @@ export function DashboardPage() {
                 name: labelType(i.key),
                 count: i.count,
               }))}
+              onAudit={() => openAudit('byType')}
             />
             <ChartCard
               title="Por setor"
               data={data.bySector.map((i) => ({ name: i.key, count: i.count }))}
+              onAudit={() => openAudit('bySector')}
             />
             <ChartCard
               title="Por parte do corpo"
@@ -180,6 +172,7 @@ export function DashboardPage() {
                 name: i.key,
                 count: i.count,
               }))}
+              onAudit={() => openAudit('byBodyPart')}
             />
             <ChartCard
               title="Por sexo"
@@ -187,10 +180,18 @@ export function DashboardPage() {
                 name: labelSex(i.key),
                 count: i.count,
               }))}
+              onAudit={() => openAudit('bySex')}
             />
           </div>
         </>
       ) : null}
+
+      <StatsAuditDialog
+        open={auditOpen}
+        trail={auditTrail}
+        year={year}
+        onClose={() => setAuditOpen(false)}
+      />
     </div>
   );
 }
@@ -198,13 +199,18 @@ export function DashboardPage() {
 function ChartCard({
   title,
   data,
+  onAudit,
 }: {
   title: string;
   data: { name: string; count: number }[];
+  onAudit: () => void;
 }) {
   return (
-    <div className="card">
-      <h2>{title}</h2>
+    <div className="card stack">
+      <div className="kpi-head">
+        <h2>{title}</h2>
+        <StatsAuditButton onClick={onAudit} />
+      </div>
       <div style={{ width: '100%', height: 260 }}>
         <ResponsiveContainer>
           <BarChart data={data.slice(0, 10)} layout="vertical" margin={{ left: 24 }}>
