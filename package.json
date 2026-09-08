@@ -1,0 +1,20 @@
+{
+  "name": "sost-dashboard-acidente",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@11.25.0",
+  "scripts": {
+    "dev": "pnpm --filter @sost/shared build && pnpm -r --parallel --filter @sost/backend --filter @sost/frontend dev",
+    "dev:api": "pnpm --filter @sost/backend dev",
+    "dev:web": "pnpm --filter @sost/frontend dev",
+    "build": "pnpm -r build",
+    "test": "pnpm --filter @sost/backend test",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "seed": "pnpm --filter @sost/backend seed",
+    "seed:admin": "pnpm --filter @sost/backend seed:admin"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
