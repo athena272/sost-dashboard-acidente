@@ -101,6 +101,7 @@ O `frontend/vercel.json` já define install/build com o monorepo + `shared`.
 ### 2) Backend (serverless)
 
 - Root Directory: `backend`
+- Framework Preset: **Other** (o `backend/vercel.json` já força `"framework": null` — não use Vite; isso exige pasta `public` e quebra o deploy da API)
 - Env:
   - `MONGODB_URI` (Atlas Free M0)
   - `JWT_SECRET`
