@@ -101,12 +101,13 @@ O `frontend/vercel.json` já define install/build com o monorepo + `shared`.
 ### 2) Backend (serverless)
 
 - Root Directory: `backend`
+- Framework Preset: **Other** (o `backend/vercel.json` força `"framework": null` — não use Vite nem o preset NestJS automático)
 - Env:
   - `MONGODB_URI` (Atlas Free M0)
   - `JWT_SECRET`
   - `ADMIN_USERNAME` / `ADMIN_PASSWORD` (opcional)
 
-O `backend/vercel.json` builda `shared` + Nest e expõe `api/index.ts` como função serverless.
+O `backend/vercel.json` builda `shared` + Nest (`tsc`). O handler `api/index.js` (JavaScript puro) carrega `dist/serverless` para preservar metadados de decorator; `public/` é só a página estática mínima exigida pela Vercel sem framework.
 
 ### MongoDB Atlas
 
