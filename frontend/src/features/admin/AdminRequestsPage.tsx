@@ -7,13 +7,27 @@ import {
 } from '@sost/shared';
 import { api } from '../../lib/api';
 
+type PopulatedUser = {
+  _id?: string;
+  name?: string;
+  username?: string;
+};
+
 type EditorRequest = {
   _id: string;
   username: string;
+  userId?: string | PopulatedUser;
   status: EditorRequestStatus;
   message?: string;
   createdAt?: string;
 };
+
+function applicantName(item: EditorRequest) {
+  if (item.userId && typeof item.userId === 'object') {
+    return item.userId.name?.trim() || '—';
+  }
+  return '—';
+}
 
 export function AdminRequestsPage() {
   const [items, setItems] = useState<EditorRequest[]>([]);
@@ -56,7 +70,8 @@ export function AdminRequestsPage() {
       <div>
         <h1>Pedidos de {ROLE_LABELS[UserRole.Editor]}</h1>
         <p className="muted">
-          Aprove ou rejeite solicitações de Visualizadores que precisam cadastrar e alterar registros.
+          Aprove ou rejeite solicitações de Visualizadores que precisam cadastrar e
+          alterar registros.
         </p>
       </div>
 
@@ -72,7 +87,11 @@ export function AdminRequestsPage() {
             ))}
           </select>
         </div>
-        <button className="btn secondary" type="button" onClick={() => void load()}>
+        <button
+          className="btn secondary"
+          type="button"
+          onClick={() => void load()}
+        >
           Atualizar
         </button>
       </div>
@@ -84,6 +103,7 @@ export function AdminRequestsPage() {
         <table>
           <thead>
             <tr>
+              <th>Nome</th>
               <th>Usuário</th>
               <th>Status</th>
               <th>Mensagem</th>
@@ -94,6 +114,7 @@ export function AdminRequestsPage() {
           <tbody>
             {items.map((item) => (
               <tr key={item._id}>
+                <td>{applicantName(item)}</td>
                 <td>{item.username}</td>
                 <td>{EDITOR_REQUEST_STATUS_LABELS[item.status]}</td>
                 <td>{item.message ?? '—'}</td>
