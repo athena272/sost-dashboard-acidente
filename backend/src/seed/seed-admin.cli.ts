@@ -3,7 +3,9 @@ import * as path from 'path';
 import * as dotenv from 'dotenv';
 import * as bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
+import { UserRole } from '@sost/shared';
 import { UserSchema } from '../users/user.schema';
+import { buildAdminCreatePayload } from './build-admin-create-payload';
 
 dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 dotenv.config();
@@ -24,8 +26,8 @@ async function main() {
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
-  await UserModel.create({ username, passwordHash });
-  console.log(`Admin created: ${username}`);
+  await UserModel.create(buildAdminCreatePayload(username, passwordHash));
+  console.log(`Admin created: ${username} (role=${UserRole.Admin})`);
   await mongoose.disconnect();
 }
 
