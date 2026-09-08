@@ -1,8 +1,10 @@
 import { Inject, Module, OnModuleInit } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ActivityLogsModule } from './activity-logs/activity-logs.module';
 import { AuthModule } from './auth/auth.module';
 import { AccidentsModule } from './accidents/accidents.module';
+import { EditorRequestsModule } from './editor-requests/editor-requests.module';
 import { StatsModule } from './stats/stats.module';
 import { UsersModule } from './users/users.module';
 import { AdminBootstrapService } from './seed/admin-bootstrap.service';
@@ -22,9 +24,11 @@ import { AdminBootstrapService } from './seed/admin-bootstrap.service';
       }),
     }),
     UsersModule,
+    ActivityLogsModule,
     AuthModule,
     AccidentsModule,
     StatsModule,
+    EditorRequestsModule,
   ],
   providers: [AdminBootstrapService],
 })
