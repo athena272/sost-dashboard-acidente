@@ -91,5 +91,32 @@ describe('AccidentsService + StatsService (integration)', () => {
     expect(overview.byCid[0].key).toBe('S61');
     expect(overview.byCid[0].count).toBe(2);
     expect(overview.byMonth.length).toBe(2);
+    expect(overview.distinctTypes).toBe(2);
+    expect(overview.distinctCids).toBe(1);
+    expect(overview.meta.apiBucketLimit).toBe(20);
+    expect(overview.meta.chartBucketLimit).toBe(10);
+    expect(overview.meta.year).toBe(2025);
+
+    const byCid = await statsService.contributors({
+      year: 2025,
+      dimension: 'cid',
+      key: 'S61',
+    });
+    expect(byCid.total).toBe(2);
+    expect(byCid.items).toHaveLength(2);
+
+    const byMonth = await statsService.contributors({
+      year: 2025,
+      dimension: 'month',
+      key: '2025-01',
+    });
+    expect(byMonth.total).toBe(1);
+    expect(byMonth.items[0].victimName).toBe('A');
+
+    const totals = await statsService.contributors({
+      year: 2025,
+      dimension: 'total',
+    });
+    expect(totals.total).toBe(2);
   });
 });
