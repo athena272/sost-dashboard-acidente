@@ -1,17 +1,18 @@
-import { useEffect, useState, type ReactNode } from 'react';
-import { Navigate, NavLink, Outlet, Route, Routes } from 'react-router-dom';
-import { acronymLabel, ROLE_DESCRIPTIONS, ROLE_LABELS } from '@sost/shared';
-import { api } from './lib/api';
-import { useAuth } from './features/auth/AuthContext';
-import { LoginPage } from './features/auth/LoginPage';
-import { RegisterPage } from './features/auth/RegisterPage';
-import { AccidentsPage } from './features/accidents/AccidentsPage';
-import { AccidentFormPage } from './features/accidents/AccidentFormPage';
-import { DashboardPage } from './features/dashboard/DashboardPage';
-import { ProfilePage } from './features/users/ProfilePage';
-import { UsersPage } from './features/users/UsersPage';
-import { AdminRequestsPage } from './features/admin/AdminRequestsPage';
-import { ActivityPage } from './features/admin/ActivityPage';
+import { useEffect, useState, type ReactNode } from "react";
+import { Navigate, NavLink, Outlet, Route, Routes } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react";
+import { acronymLabel, ROLE_DESCRIPTIONS, ROLE_LABELS } from "@sost/shared";
+import { api } from "./lib/api";
+import { useAuth } from "./features/auth/AuthContext";
+import { LoginPage } from "./features/auth/LoginPage";
+import { RegisterPage } from "./features/auth/RegisterPage";
+import { AccidentsPage } from "./features/accidents/AccidentsPage";
+import { AccidentFormPage } from "./features/accidents/AccidentFormPage";
+import { DashboardPage } from "./features/dashboard/DashboardPage";
+import { ProfilePage } from "./features/users/ProfilePage";
+import { UsersPage } from "./features/users/UsersPage";
+import { AdminRequestsPage } from "./features/admin/AdminRequestsPage";
+import { ActivityPage } from "./features/admin/ActivityPage";
 
 function AdminRoute({ children }: { children: ReactNode }) {
   const { isAdmin, loading } = useAuth();
@@ -38,7 +39,7 @@ function ProtectedLayout() {
     }
     let cancelled = false;
     const load = () => {
-      api<{ pendingEditorRequests: number }>('/notifications/summary')
+      api<{ pendingEditorRequests: number }>("/notifications/summary")
         .then((summary) => {
           if (!cancelled) setPendingRequests(summary.pendingEditorRequests);
         })
@@ -68,7 +69,7 @@ function ProtectedLayout() {
     <div className="app-shell">
       <header className="topbar">
         <div className="brand">
-          <strong>{acronymLabel('SOST')}</strong>
+          <strong>{acronymLabel("SOST")}</strong>
           <span>Dashboard de acidentes</span>
         </div>
         <nav className="nav">
@@ -86,7 +87,10 @@ function ProtectedLayout() {
               <NavLink to="/admin/requests" className="nav-with-badge">
                 Pedidos
                 {pendingRequests > 0 ? (
-                  <span className="badge" aria-label={`${pendingRequests} pendentes`}>
+                  <span
+                    className="badge"
+                    aria-label={`${pendingRequests} pendentes`}
+                  >
                     {pendingRequests}
                   </span>
                 ) : null}
@@ -94,10 +98,7 @@ function ProtectedLayout() {
               <NavLink to="/activity">Histórico</NavLink>
             </>
           ) : null}
-          <span
-            className="role-chip"
-            title={ROLE_DESCRIPTIONS[user.role]}
-          >
+          <span className="role-chip" title={ROLE_DESCRIPTIONS[user.role]}>
             {user.username}
             <small>{ROLE_LABELS[user.role]}</small>
           </span>
@@ -115,48 +116,51 @@ function ProtectedLayout() {
 
 export function App() {
   return (
-    <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route element={<ProtectedLayout />}>
-        <Route index element={<DashboardPage />} />
-        <Route path="accidents" element={<AccidentsPage />} />
-        <Route
-          path="accidents/new"
-          element={
-            <WriteRoute>
-              <AccidentFormPage />
-            </WriteRoute>
-          }
-        />
-        <Route path="accidents/:id" element={<AccidentFormPage />} />
-        <Route path="profile" element={<ProfilePage />} />
-        <Route
-          path="users"
-          element={
-            <AdminRoute>
-              <UsersPage />
-            </AdminRoute>
-          }
-        />
-        <Route
-          path="admin/requests"
-          element={
-            <AdminRoute>
-              <AdminRequestsPage />
-            </AdminRoute>
-          }
-        />
-        <Route
-          path="activity"
-          element={
-            <AdminRoute>
-              <ActivityPage />
-            </AdminRoute>
-          }
-        />
-      </Route>
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <>
+      <Analytics />
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route element={<ProtectedLayout />}>
+          <Route index element={<DashboardPage />} />
+          <Route path="accidents" element={<AccidentsPage />} />
+          <Route
+            path="accidents/new"
+            element={
+              <WriteRoute>
+                <AccidentFormPage />
+              </WriteRoute>
+            }
+          />
+          <Route path="accidents/:id" element={<AccidentFormPage />} />
+          <Route path="profile" element={<ProfilePage />} />
+          <Route
+            path="users"
+            element={
+              <AdminRoute>
+                <UsersPage />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="admin/requests"
+            element={
+              <AdminRoute>
+                <AdminRequestsPage />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="activity"
+            element={
+              <AdminRoute>
+                <ActivityPage />
+              </AdminRoute>
+            }
+          />
+        </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </>
   );
 }
