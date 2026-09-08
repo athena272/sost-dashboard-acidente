@@ -187,7 +187,7 @@ export function AccidentFormFields({ value, onChange, errors = {} }: Props) {
         />
       </div>
 
-      <div className="grid-2">
+      <div className="grid-3">
         <TextField
           label="Setor destinatário"
           value={value.destinationSector}
@@ -201,6 +201,17 @@ export function AccidentFormFields({ value, onChange, errors = {} }: Props) {
           onChange={(next) => set('subject', next)}
           placeholder="Digite o assunto"
           error={errors.subject}
+        />
+        <SelectField
+          label="Situação"
+          value={value.status}
+          onChange={(next) => set('status', next)}
+          placeholder="Selecione a situação"
+          options={statusOptions.map((option) => ({
+            value: option,
+            label: ACCIDENT_STATUS_LABELS[option],
+          }))}
+          error={errors.status}
         />
       </div>
 
@@ -228,27 +239,14 @@ export function AccidentFormFields({ value, onChange, errors = {} }: Props) {
         />
       </div>
 
-      <div className="grid-2">
-        <SelectField
-          label="Situação"
-          value={value.status}
-          onChange={(next) => set('status', next)}
-          placeholder="Selecione a situação"
-          options={statusOptions.map((option) => ({
-            value: option,
-            label: ACCIDENT_STATUS_LABELS[option],
-          }))}
-          error={errors.status}
-        />
-        <TextAreaField
-          label="Observações"
-          value={value.notes}
-          onChange={(next) => set('notes', next)}
-          placeholder="Digite observações adicionais do registro"
-          rows={3}
-          error={errors.notes}
-        />
-      </div>
+      <TextAreaField
+        label="Observações"
+        value={value.notes}
+        onChange={(next) => set('notes', next)}
+        placeholder="Digite observações adicionais do registro"
+        rows={4}
+        error={errors.notes}
+      />
     </div>
   );
 }
