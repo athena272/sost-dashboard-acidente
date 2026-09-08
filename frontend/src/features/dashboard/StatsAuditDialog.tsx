@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { PaginationBar } from '../../components/pagination/PaginationBar';
 import { api } from '../../lib/api';
 import {
   describeDimensionSelection,
@@ -233,28 +234,13 @@ export function StatsAuditDialog({ open, trail, yearQuery, onClose }: Props) {
                   </tbody>
                 </table>
               </div>
-              <div className="toolbar">
-                <span className="muted">
-                  {data.total} registro(s) — página {data.page} de{' '}
-                  {data.totalPages}
-                </span>
-                <button
-                  className="btn secondary"
-                  type="button"
-                  disabled={page <= 1}
-                  onClick={() => setPage((current) => current - 1)}
-                >
-                  Anterior
-                </button>
-                <button
-                  className="btn secondary"
-                  type="button"
-                  disabled={page >= data.totalPages}
-                  onClick={() => setPage((current) => current + 1)}
-                >
-                  Próxima
-                </button>
-              </div>
+              <PaginationBar
+                page={data.page}
+                totalPages={data.totalPages}
+                total={data.total}
+                summaryLabel="registro(s)"
+                onPageChange={setPage}
+              />
             </>
           ) : null}
         </section>

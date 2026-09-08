@@ -5,6 +5,7 @@ import {
 } from '@sost/shared';
 import { ClearFiltersButton } from '../../components/ClearFiltersButton';
 import { SearchField } from '../../components/forms/SearchField';
+import { PaginationBar } from '../../components/pagination/PaginationBar';
 import { api } from '../../lib/api';
 import {
   DEFAULT_ACTIVITY_LIST_FILTERS,
@@ -195,27 +196,13 @@ export function ActivityPage() {
               ))}
             </tbody>
           </table>
-          <div className="toolbar" style={{ marginTop: '1rem' }}>
-            <span className="muted">
-              {data.total} evento(s) — página {data.page} de {data.totalPages}
-            </span>
-            <button
-              className="btn secondary"
-              type="button"
-              disabled={page <= 1}
-              onClick={() => void load(page - 1)}
-            >
-              Anterior
-            </button>
-            <button
-              className="btn secondary"
-              type="button"
-              disabled={page >= data.totalPages}
-              onClick={() => void load(page + 1)}
-            >
-              Próxima
-            </button>
-          </div>
+          <PaginationBar
+            page={data.page}
+            totalPages={data.totalPages}
+            total={data.total}
+            summaryLabel="evento(s)"
+            onPageChange={(next) => void load(next)}
+          />
         </div>
       ) : null}
     </div>
