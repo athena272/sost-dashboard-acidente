@@ -10,6 +10,18 @@ export function clampPage(page: number, totalPages: number): number {
   return Math.min(max, Math.max(1, Math.floor(page)));
 }
 
+/** Builds the shared "N label(s) — página X de Y" copy used above and below tables. */
+export function formatPaginationSummary(
+  total: number,
+  summaryLabel: string,
+  page: number,
+  totalPages: number,
+): string {
+  const safeTotalPages = Math.max(1, Math.floor(totalPages) || 1);
+  const safePage = clampPage(page, safeTotalPages);
+  return `${total} ${summaryLabel} — página ${safePage} de ${safeTotalPages}`;
+}
+
 /**
  * Builds a compact list of page numbers with optional ellipsis gaps.
  * Always includes first and last when the range is truncated.
