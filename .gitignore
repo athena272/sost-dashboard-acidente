@@ -4,6 +4,7 @@ build
 coverage
 .env
 .env.local
+.env.atlas
 *.log
 .DS_Store
 .turbo

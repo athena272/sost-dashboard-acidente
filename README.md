@@ -110,7 +110,32 @@ O `backend/vercel.json` builda `shared` + Nest e expõe `api/index.ts` como fun�
 
 ### MongoDB Atlas
 
-Substitua o Docker local pela connection string do Atlas nas variáveis do projeto da API na Vercel. Localmente continue com `pnpm docker:up`.
+O database **não** precisa ser criado na UI do Atlas: ele nasce no primeiro insert quando a URI inclui o nome (`/sost-dashboard`).
+
+**Não** faça `mongodump` do Mongo local para o Atlas — isso traria usuários e CATs de teste. Popule o cluster vazio só com os seeds:
+
+1. Network Access no Atlas (ex.: `0.0.0.0/0` no M0 para Vercel + seed local).
+2. Database User com senha forte (diferente da senha do login `admin` do app).
+3. URI com database na path — preferir SRV:
+
+```text
+mongodb+srv://USER:PASS@cluster0.xxxxx.mongodb.net/sost-dashboard?retryWrites=true&w=majority
+```
+
+Se o Node retornar `querySrv ECONNREFUSED`, use a connection string **clássica** (`mongodb://` multi-host) do Atlas Connect, também com `/sost-dashboard` antes do `?`.
+
+Seed apontando ao Atlas (PowerShell — variáveis da sessão têm prioridade sobre o `.env`; **não** commitá-las):
+
+```powershell
+$env:MONGODB_URI="mongodb+srv://USER:PASS@cluster0.xxxxx.mongodb.net/sost-dashboard?retryWrites=true&w=majority"
+$env:ADMIN_USERNAME="admin"
+$env:ADMIN_PASSWORD="SENHA_FORTE_DO_APP"
+
+pnpm seed:admin
+pnpm seed
+```
+
+Checklist no Data Explorer: collection `users` com 1 admin (`role=admin`); `accidents` só com dados da planilha (`source=seed`). Guarde credenciais em `.env` / `.env.atlas` (gitignored). Localmente continue com `pnpm docker:up`. Na Vercel, use a mesma `MONGODB_URI` (+ `JWT_SECRET`; `ADMIN_*` só importam se o DB ainda estiver vazio — bootstrap).
 
 ## Testes
 
