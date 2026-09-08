@@ -47,7 +47,7 @@ pnpm --filter @sost/backend seed -- --replace
 
 ## Desenvolvimento (terminais)
 
-**Serverless na Vercel não impede o local.** Localmente a API sobe com `listen()` (`src/main.ts`). Na Vercel usa o handler em `backend/api/index.ts`.
+**Serverless na Vercel não impede o local.** Localmente a API sobe com `listen()` (`src/main.ts`). Na Vercel usa o handler em `backend/api/index.js`.
 
 Docker **não** sobe API/web — só o banco.
 
@@ -88,6 +88,8 @@ pnpm run dev:web    # terminal 3 — frontend
 - Histórico de atividades e listagem de usuários são exclusivos do admin.
 
 ## Deploy na Vercel (grátis)
+
+Lições, checklist e post-mortems: [`docs/README.md`](docs/README.md).
 
 Crie **dois projetos** no mesmo repositório:
 
@@ -155,7 +157,8 @@ CI no GitHub Actions (`.github/workflows/ci.yml`) roda em **Node.js 24**, sobe M
 ## Estrutura
 
 ```
-backend/         API NestJS (local: main.ts | Vercel: api/index.ts)
+backend/         API NestJS (local: main.ts | Vercel: api/index.js)
+docs/            Lições de deploy (Vercel + Atlas)
 frontend/        App React
 shared/          Tipos/labels compartilhados
 spreadsheet/     Planilha fonte do seed
