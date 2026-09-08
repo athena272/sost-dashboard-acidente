@@ -4,7 +4,14 @@ import {
   ROLE_LABELS,
   UserRole,
 } from '@sost/shared';
+import { ClearFiltersButton } from '../../components/ClearFiltersButton';
+import { SearchField } from '../../components/forms/SearchField';
 import { api } from '../../lib/api';
+import {
+  DEFAULT_USERS_LIST_FILTERS,
+  buildUsersListParams,
+  type UsersListFilters,
+} from './usersListFilters';
 
 type UserItem = {
   _id?: string;
@@ -24,30 +31,36 @@ type ListResponse = {
 
 export function UsersPage() {
   const [data, setData] = useState<ListResponse | null>(null);
-  const [q, setQ] = useState('');
-  const [role, setRole] = useState('');
-  const [createdFrom, setCreatedFrom] = useState('');
-  const [createdTo, setCreatedTo] = useState('');
-  const [sortBy, setSortBy] = useState('createdAt');
-  const [sortDir, setSortDir] = useState('desc');
+  const [q, setQ] = useState(DEFAULT_USERS_LIST_FILTERS.q);
+  const [role, setRole] = useState(DEFAULT_USERS_LIST_FILTERS.role);
+  const [createdFrom, setCreatedFrom] = useState(
+    DEFAULT_USERS_LIST_FILTERS.createdFrom,
+  );
+  const [createdTo, setCreatedTo] = useState(
+    DEFAULT_USERS_LIST_FILTERS.createdTo,
+  );
+  const [sortBy, setSortBy] = useState(DEFAULT_USERS_LIST_FILTERS.sortBy);
+  const [sortDir, setSortDir] = useState(DEFAULT_USERS_LIST_FILTERS.sortDir);
   const [page, setPage] = useState(1);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
-  async function load(nextPage = page) {
+  async function load(
+    nextPage = page,
+    overrides?: Partial<UsersListFilters>,
+  ) {
     setLoading(true);
     setError('');
     try {
-      const params = new URLSearchParams({
-        page: String(nextPage),
-        limit: '15',
-        sortBy,
-        sortDir,
-      });
-      if (q.trim()) params.set('q', q.trim());
-      if (role) params.set('role', role);
-      if (createdFrom) params.set('createdFrom', createdFrom);
-      if (createdTo) params.set('createdTo', createdTo);
+      const filters: UsersListFilters = {
+        q: overrides?.q ?? q,
+        role: overrides?.role ?? role,
+        createdFrom: overrides?.createdFrom ?? createdFrom,
+        createdTo: overrides?.createdTo ?? createdTo,
+        sortBy: overrides?.sortBy ?? sortBy,
+        sortDir: overrides?.sortDir ?? sortDir,
+      };
+      const params = buildUsersListParams(nextPage, filters);
       const result = await api<ListResponse>(`/users?${params}`);
       setData(result);
       setPage(nextPage);
@@ -62,6 +75,16 @@ export function UsersPage() {
     void load(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  function clearFilters() {
+    setQ(DEFAULT_USERS_LIST_FILTERS.q);
+    setRole(DEFAULT_USERS_LIST_FILTERS.role);
+    setCreatedFrom(DEFAULT_USERS_LIST_FILTERS.createdFrom);
+    setCreatedTo(DEFAULT_USERS_LIST_FILTERS.createdTo);
+    setSortBy(DEFAULT_USERS_LIST_FILTERS.sortBy);
+    setSortDir(DEFAULT_USERS_LIST_FILTERS.sortDir);
+    void load(1, DEFAULT_USERS_LIST_FILTERS);
+  }
 
   async function changeRole(user: UserItem, nextRole: UserRole) {
     const id = user.id ?? user._id;
@@ -85,47 +108,80 @@ export function UsersPage() {
       </div>
 
       <div className="card toolbar">
-        <div className="field">
-          <label>Busca</label>
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Digite o usuário ou o nome" aria-label="Buscar por usuário ou nome" />
+        <div className="toolbar-search">
+          <div className="field">
+            <label htmlFor="users-search">Busca</label>
+            <SearchField
+              id="users-search"
+              value={q}
+              onChange={setQ}
+              placeholder="Digite o usuário ou o nome"
+              aria-label="Buscar por usuário ou nome"
+            />
+          </div>
         </div>
-        <div className="field">
-          <label>Perfil</label>
-          <select value={role} onChange={(e) => setRole(e.target.value)}>
-            <option value="">Todos</option>
-            {Object.values(UserRole).map((value) => (
-              <option key={value} value={value}>
-                {ROLE_LABELS[value]}
-              </option>
-            ))}
-          </select>
+        <div className="toolbar-controls">
+          <div className="field">
+            <label htmlFor="users-role">Perfil</label>
+            <select
+              id="users-role"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+            >
+              <option value="">Todos</option>
+              {Object.values(UserRole).map((value) => (
+                <option key={value} value={value}>
+                  {ROLE_LABELS[value]}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="field">
+            <label htmlFor="users-created-from">Criado de</label>
+            <input
+              id="users-created-from"
+              type="date"
+              value={createdFrom}
+              onChange={(e) => setCreatedFrom(e.target.value)}
+            />
+          </div>
+          <div className="field">
+            <label htmlFor="users-created-to">Criado até</label>
+            <input
+              id="users-created-to"
+              type="date"
+              value={createdTo}
+              onChange={(e) => setCreatedTo(e.target.value)}
+            />
+          </div>
+          <div className="field">
+            <label htmlFor="users-sort-by">Ordenar por</label>
+            <select
+              id="users-sort-by"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+            >
+              <option value="createdAt">Data de criação</option>
+              <option value="username">Usuário</option>
+              <option value="role">Perfil</option>
+            </select>
+          </div>
+          <div className="field">
+            <label htmlFor="users-sort-dir">Direção</label>
+            <select
+              id="users-sort-dir"
+              value={sortDir}
+              onChange={(e) => setSortDir(e.target.value)}
+            >
+              <option value="desc">Decrescente</option>
+              <option value="asc">Crescente</option>
+            </select>
+          </div>
+          <button className="btn" type="button" onClick={() => void load(1)}>
+            Filtrar
+          </button>
+          <ClearFiltersButton onClick={clearFilters} />
         </div>
-        <div className="field">
-          <label>Criado de</label>
-          <input type="date" value={createdFrom} onChange={(e) => setCreatedFrom(e.target.value)} />
-        </div>
-        <div className="field">
-          <label>Criado até</label>
-          <input type="date" value={createdTo} onChange={(e) => setCreatedTo(e.target.value)} />
-        </div>
-        <div className="field">
-          <label>Ordenar por</label>
-          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-            <option value="createdAt">Data de criação</option>
-            <option value="username">Usuário</option>
-            <option value="role">Perfil</option>
-          </select>
-        </div>
-        <div className="field">
-          <label>Direção</label>
-          <select value={sortDir} onChange={(e) => setSortDir(e.target.value)}>
-            <option value="desc">Decrescente</option>
-            <option value="asc">Crescente</option>
-          </select>
-        </div>
-        <button className="btn" type="button" onClick={() => void load(1)}>
-          Filtrar
-        </button>
       </div>
 
       {error ? <p className="error">{error}</p> : null}
