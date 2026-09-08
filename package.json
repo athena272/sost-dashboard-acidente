@@ -15,6 +15,6 @@
     "seed:admin": "pnpm --filter @sost/backend seed:admin"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=24"
   }
 }
