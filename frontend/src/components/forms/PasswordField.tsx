@@ -1,4 +1,5 @@
 import { useId, useState } from 'react';
+import { FieldShell } from './TextField';
 
 type Props = {
   id?: string;
@@ -7,7 +8,10 @@ type Props = {
   onChange: (value: string) => void;
   autoComplete?: string;
   required?: boolean;
-  minLength?: number;
+  error?: string;
+  hint?: string;
+  placeholder?: string;
+  ariaLabel?: string;
 };
 
 export function PasswordField({
@@ -17,15 +21,25 @@ export function PasswordField({
   onChange,
   autoComplete = 'current-password',
   required,
-  minLength,
+  error,
+  hint,
+  placeholder,
+  ariaLabel,
 }: Props) {
   const generatedId = useId();
   const inputId = id ?? generatedId;
+  const errorId = `${inputId}-error`;
+  const hintId = `${inputId}-hint`;
   const [visible, setVisible] = useState(false);
 
   return (
-    <div className="field">
-      <label htmlFor={inputId}>{label}</label>
+    <FieldShell
+      id={inputId}
+      label={label}
+      error={error}
+      hint={hint}
+      required={required}
+    >
       <div className="password-field">
         <input
           id={inputId}
@@ -33,8 +47,12 @@ export function PasswordField({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           autoComplete={autoComplete}
-          required={required}
-          minLength={minLength}
+          placeholder={placeholder}
+          className={error ? 'field-invalid' : undefined}
+          aria-label={ariaLabel ?? label}
+          aria-invalid={Boolean(error)}
+          aria-required={required || undefined}
+          aria-describedby={error ? errorId : hint ? hintId : undefined}
         />
         <button
           type="button"
@@ -45,6 +63,6 @@ export function PasswordField({
           {visible ? 'Ocultar' : 'Mostrar'}
         </button>
       </div>
-    </div>
+    </FieldShell>
   );
 }

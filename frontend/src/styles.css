@@ -162,6 +162,34 @@ h3 {
   background: #fff;
 }
 
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  outline: 2px solid rgba(11, 95, 107, 0.35);
+  outline-offset: 1px;
+  border-color: var(--brand);
+}
+
+.field-invalid {
+  border-color: var(--danger) !important;
+}
+
+.field-error {
+  margin: 0;
+  color: var(--danger);
+  font-size: 0.85rem;
+}
+
+.field-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.field-required {
+  color: var(--danger);
+}
+
 .btn {
   border: none;
   border-radius: 0.5rem;

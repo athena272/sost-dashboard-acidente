@@ -51,7 +51,10 @@ jobs:
         run: pnpm --filter @sost/shared build
 
       - name: Run backend tests
-        run: pnpm test
+        run: pnpm --filter @sost/backend test
+
+      - name: Run frontend tests
+        run: pnpm --filter @sost/frontend test
 
       - name: Typecheck backend
         run: pnpm --filter @sost/backend exec tsc -p tsconfig.build.json --noEmit

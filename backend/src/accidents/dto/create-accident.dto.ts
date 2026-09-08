@@ -1,10 +1,14 @@
+import { Type } from 'class-transformer';
 import {
   IsDateString,
   IsEnum,
+  IsInt,
+  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
   MaxLength,
+  MinLength,
 } from 'class-validator';
 import {
   AccidentSource,
@@ -15,23 +19,25 @@ import {
 
 export class CreateAccidentDto {
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   reportNumber?: number;
 
-  @IsOptional()
   @IsString()
+  @IsNotEmpty({ message: 'Informe a empresa' })
   @MaxLength(200)
-  company?: string;
+  company!: string;
 
   @IsOptional()
   @IsString()
   @MaxLength(100)
   catNumber?: string;
 
-  @IsOptional()
   @IsString()
+  @IsNotEmpty({ message: 'Informe o nome da vítima' })
+  @MinLength(2, { message: 'O nome da vítima deve ter pelo menos 2 caracteres' })
   @MaxLength(200)
-  victimName?: string;
+  victimName!: string;
 
   @IsOptional()
   @IsEnum(Sex)
@@ -57,13 +63,12 @@ export class CreateAccidentDto {
   @MaxLength(200)
   employeeAllocation?: string;
 
-  @IsOptional()
-  @IsDateString()
-  accidentDate?: string;
+  @IsDateString({}, { message: 'Informe a data do acidente' })
+  accidentDate!: string;
 
-  @IsOptional()
-  @IsNumber()
-  emissionYear?: number;
+  @Type(() => Number)
+  @IsInt({ message: 'Informe o ano de emissão' })
+  emissionYear!: number;
 
   @IsOptional()
   @IsDateString()
@@ -84,9 +89,8 @@ export class CreateAccidentDto {
   @MaxLength(200)
   causingAgent?: string;
 
-  @IsOptional()
-  @IsEnum(AccidentType)
-  accidentType?: AccidentType;
+  @IsEnum(AccidentType, { message: 'Informe o tipo do acidente' })
+  accidentType!: AccidentType;
 
   @IsOptional()
   @IsString()
@@ -94,6 +98,7 @@ export class CreateAccidentDto {
   cid?: string;
 
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   daysOff?: number;
 

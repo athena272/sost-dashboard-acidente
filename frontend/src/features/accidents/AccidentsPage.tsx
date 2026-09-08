@@ -12,11 +12,20 @@ type ListResponse = {
   totalPages: number;
 };
 
+function normalizeDateRange(from: string, to: string) {
+  if (from && to && from > to) {
+    return { from: to, to: from };
+  }
+  return { from, to };
+}
+
 export function AccidentsPage() {
   const { canWriteAccidents } = useAuth();
   const [data, setData] = useState<ListResponse | null>(null);
   const [search, setSearch] = useState('');
   const [year, setYear] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
   const [page, setPage] = useState(1);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -25,12 +34,19 @@ export function AccidentsPage() {
     setLoading(true);
     setError('');
     try {
+      const range = normalizeDateRange(dateFrom.trim(), dateTo.trim());
+      if (range.from !== dateFrom || range.to !== dateTo) {
+        setDateFrom(range.from);
+        setDateTo(range.to);
+      }
       const params = new URLSearchParams({
         page: String(nextPage),
         limit: '15',
       });
       if (search.trim()) params.set('search', search.trim());
       if (year.trim()) params.set('year', year.trim());
+      if (range.from) params.set('accidentDateFrom', range.from);
+      if (range.to) params.set('accidentDateTo', range.to);
       const result = await api<ListResponse>(`/accidents?${params}`);
       setData(result);
       setPage(nextPage);
@@ -63,19 +79,44 @@ export function AccidentsPage() {
 
       <div className="card toolbar">
         <div className="field">
-          <label>Busca</label>
+          <label htmlFor="accidents-search">Busca</label>
           <input
+            id="accidents-search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Vítima, função, CID…"
+            placeholder="Digite vítima, função ou CID"
+            aria-label="Buscar por vítima, função ou CID"
           />
         </div>
         <div className="field">
-          <label>Ano de emissão</label>
+          <label htmlFor="accidents-year">Ano de emissão</label>
           <input
+            id="accidents-year"
             value={year}
             onChange={(e) => setYear(e.target.value)}
-            placeholder="2025"
+            placeholder="Digite o ano de emissão"
+            inputMode="numeric"
+            aria-label="Filtrar por ano de emissão"
+          />
+        </div>
+        <div className="field">
+          <label htmlFor="accidents-date-from">Data do acidente — De</label>
+          <input
+            id="accidents-date-from"
+            type="date"
+            value={dateFrom}
+            onChange={(e) => setDateFrom(e.target.value)}
+            aria-label="Data inicial do acidente"
+          />
+        </div>
+        <div className="field">
+          <label htmlFor="accidents-date-to">Data do acidente — Até</label>
+          <input
+            id="accidents-date-to"
+            type="date"
+            value={dateTo}
+            onChange={(e) => setDateTo(e.target.value)}
+            aria-label="Data final do acidente"
           />
         </div>
         <button className="btn" type="button" onClick={() => void load(1)}>

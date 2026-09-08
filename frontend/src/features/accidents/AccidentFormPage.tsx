@@ -12,6 +12,7 @@ import {
   formToPayload,
   AccidentFormValues,
 } from './types';
+import { validateAccidentForm } from './validateAccidentForm';
 
 export function AccidentFormPage() {
   const { id } = useParams();
@@ -20,6 +21,7 @@ export function AccidentFormPage() {
   const { canWriteAccidents } = useAuth();
   const readOnly = isEdit && !canWriteAccidents;
   const [form, setForm] = useState<AccidentFormValues>(emptyForm());
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
@@ -35,8 +37,15 @@ export function AccidentFormPage() {
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     if (readOnly) return;
-    setSaving(true);
     setError('');
+    const validation = validateAccidentForm(form);
+    if (!validation.ok) {
+      setFieldErrors(validation.fieldErrors);
+      setError(validation.message);
+      return;
+    }
+    setFieldErrors({});
+    setSaving(true);
     try {
       const payload = formToPayload(form);
       if (isEdit && id) {
@@ -61,7 +70,7 @@ export function AccidentFormPage() {
   if (loading) return <p className="muted">Carregando…</p>;
 
   return (
-    <form className="stack" onSubmit={onSubmit}>
+    <form className="stack" onSubmit={onSubmit} noValidate>
       <div>
         <h1>
           {readOnly ? 'Detalhes' : isEdit ? 'Editar' : 'Novo'} registro de{' '}
@@ -70,11 +79,21 @@ export function AccidentFormPage() {
         <p className="muted">
           {readOnly
             ? `Consulta do registro (perfil Visualizador não altera ${acronymLabel('CAT')}).`
-            : `Cadastro organizado de acidentes do ${acronymLabel('SOST')}.`}
+            : `Cadastro organizado de acidentes do ${acronymLabel('SOST')}. Campos marcados com * são obrigatórios.`}
         </p>
       </div>
       <fieldset className="card form-fieldset" disabled={readOnly}>
-        <AccidentFormFields value={form} onChange={setForm} />
+        <AccidentFormFields
+          value={form}
+          onChange={(next) => {
+            setForm(next);
+            if (Object.keys(fieldErrors).length > 0) {
+              setFieldErrors({});
+              setError('');
+            }
+          }}
+          errors={fieldErrors}
+        />
       </fieldset>
       {error ? <p className="error">{error}</p> : null}
       <div className="actions">

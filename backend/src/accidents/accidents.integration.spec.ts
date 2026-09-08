@@ -48,6 +48,7 @@ describe('AccidentsService + StatsService (integration)', () => {
 
   it('creates and lists accidents', async () => {
     await accidentsService.create({
+      company: 'EBSERH',
       victimName: 'Maria',
       role: 'Enfermeira',
       emissionYear: 2024,
@@ -63,8 +64,50 @@ describe('AccidentsService + StatsService (integration)', () => {
     expect(result.items[0].victimName).toBe('Maria');
   });
 
+  it('filters accidents by accidentDate range', async () => {
+    await accidentsService.create({
+      company: 'EBSERH',
+      victimName: 'Cedo',
+      accidentDate: '2024-01-10',
+      emissionYear: 2024,
+      accidentType: AccidentType.Typical,
+    });
+    await accidentsService.create({
+      company: 'EBSERH',
+      victimName: 'Meio',
+      accidentDate: '2024-06-15',
+      emissionYear: 2024,
+      accidentType: AccidentType.Typical,
+    });
+    await accidentsService.create({
+      company: 'EBSERH',
+      victimName: 'Tarde',
+      accidentDate: '2024-12-20',
+      emissionYear: 2024,
+      accidentType: AccidentType.Typical,
+    });
+
+    const ranged = await accidentsService.findAll({
+      page: 1,
+      limit: 10,
+      accidentDateFrom: '2024-06-01',
+      accidentDateTo: '2024-06-30',
+    });
+    expect(ranged.total).toBe(1);
+    expect(ranged.items[0].victimName).toBe('Meio');
+
+    const swapped = await accidentsService.findAll({
+      page: 1,
+      limit: 10,
+      accidentDateFrom: '2024-12-31',
+      accidentDateTo: '2024-01-01',
+    });
+    expect(swapped.total).toBe(3);
+  });
+
   it('aggregates overview stats', async () => {
     await accidentsService.create({
+      company: 'EBSERH',
       victimName: 'A',
       role: 'Enfermeira',
       emissionYear: 2025,
@@ -75,6 +118,7 @@ describe('AccidentsService + StatsService (integration)', () => {
       accidentDate: '2025-01-15',
     });
     await accidentsService.create({
+      company: 'EBSERH',
       victimName: 'B',
       role: 'Técnico de Enfermagem',
       emissionYear: 2025,
@@ -120,6 +164,7 @@ describe('AccidentsService + StatsService (integration)', () => {
     expect(totals.total).toBe(2);
 
     await accidentsService.create({
+      company: 'EBSERH',
       victimName: 'C',
       role: 'Médica',
       emissionYear: 2023,
@@ -128,6 +173,7 @@ describe('AccidentsService + StatsService (integration)', () => {
       accidentDate: '2023-06-01',
     });
     await accidentsService.create({
+      company: 'EBSERH',
       victimName: 'D',
       role: 'Médica',
       emissionYear: 2024,

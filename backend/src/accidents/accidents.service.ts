@@ -64,6 +64,23 @@ export class AccidentsService {
       ];
     }
 
+    let dateFrom = query.accidentDateFrom;
+    let dateTo = query.accidentDateTo;
+    if (dateFrom && dateTo && dateFrom > dateTo) {
+      const swap = dateFrom;
+      dateFrom = dateTo;
+      dateTo = swap;
+    }
+    if (dateFrom || dateTo) {
+      filter.accidentDate = {};
+      if (dateFrom) {
+        filter.accidentDate.$gte = new Date(`${dateFrom}T00:00:00.000Z`);
+      }
+      if (dateTo) {
+        filter.accidentDate.$lte = new Date(`${dateTo}T23:59:59.999Z`);
+      }
+    }
+
     const [items, total] = await Promise.all([
       this.accidentModel
         .find(filter)
