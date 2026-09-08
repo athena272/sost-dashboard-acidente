@@ -6,6 +6,8 @@ let cachedApp: Express | undefined;
 /**
  * Express app usado pela Vercel (serverless).
  * Em cold start cria o Nest uma vez e reutiliza nas próximas invocações.
+ * O entrypoint da plataforma é `api/index.js` (JS puro), que faz require deste módulo
+ * já compilado em `dist/` — assim os metadados de decorator do Nest permanecem intactos.
  */
 export async function getExpressApp(): Promise<Express> {
   if (cachedApp) {
