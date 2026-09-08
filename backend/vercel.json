@@ -1,7 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
   "installCommand": "cd .. && pnpm install",
   "buildCommand": "cd .. && pnpm --filter @sost/shared build && pnpm --filter @sost/backend build",
+  "outputDirectory": null,
   "rewrites": [{ "source": "/(.*)", "destination": "/api" }],
   "functions": {
     "api/index.ts": {
