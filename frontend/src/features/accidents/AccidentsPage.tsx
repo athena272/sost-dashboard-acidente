@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FilterX } from 'lucide-react';
 import { acronymLabel } from '@sost/shared';
+import { ClearFiltersButton } from '../../components/ClearFiltersButton';
+import { SearchField } from '../../components/forms/SearchField';
 import { api } from '../../lib/api';
 import { useAuth } from '../auth/AuthContext';
 import {
@@ -122,78 +123,75 @@ export function AccidentsPage() {
       </div>
 
       <div className="card toolbar">
-        <div className="field">
-          <label htmlFor="accidents-search">Busca</label>
-          <input
-            id="accidents-search"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Digite vítima, função ou CID"
-            aria-label="Buscar por vítima, função ou CID"
-          />
+        <div className="toolbar-search">
+          <div className="field">
+            <label htmlFor="accidents-search">Busca</label>
+            <SearchField
+              id="accidents-search"
+              value={search}
+              onChange={setSearch}
+              placeholder="Digite vítima, função ou CID"
+              aria-label="Buscar por vítima, função ou CID"
+            />
+          </div>
         </div>
-        <div className="field">
-          <label htmlFor="accidents-year">Ano de emissão</label>
-          <input
-            id="accidents-year"
-            value={year}
-            onChange={(e) => setYear(e.target.value)}
-            placeholder="Digite o ano de emissão"
-            inputMode="numeric"
-            aria-label="Filtrar por ano de emissão"
-          />
+        <div className="toolbar-controls">
+          <div className="field">
+            <label htmlFor="accidents-year">Ano de emissão</label>
+            <input
+              id="accidents-year"
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              placeholder="Digite o ano de emissão"
+              inputMode="numeric"
+              aria-label="Filtrar por ano de emissão"
+            />
+          </div>
+          <div className="field">
+            <label htmlFor="accidents-date-from">Data do acidente — De</label>
+            <input
+              id="accidents-date-from"
+              type="date"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+              aria-label="Data inicial do acidente"
+            />
+          </div>
+          <div className="field">
+            <label htmlFor="accidents-date-to">Data do acidente — Até</label>
+            <input
+              id="accidents-date-to"
+              type="date"
+              value={dateTo}
+              onChange={(e) => setDateTo(e.target.value)}
+              aria-label="Data final do acidente"
+            />
+          </div>
+          <div className="field">
+            <label htmlFor="accidents-sort">Ordenar por</label>
+            <select
+              id="accidents-sort"
+              value={sortKey}
+              onChange={(e) => setSortKey(e.target.value)}
+              aria-label="Ordenar listagem de acidentes"
+            >
+              {ACCIDENTS_SORT_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <button className="btn" type="button" onClick={() => void load(1)}>
+            Filtrar
+          </button>
+          {canWriteAccidents ? (
+            <Link className="btn" to="/accidents/new">
+              Novo registro
+            </Link>
+          ) : null}
+          <ClearFiltersButton onClick={clearFilters} />
         </div>
-        <div className="field">
-          <label htmlFor="accidents-date-from">Data do acidente — De</label>
-          <input
-            id="accidents-date-from"
-            type="date"
-            value={dateFrom}
-            onChange={(e) => setDateFrom(e.target.value)}
-            aria-label="Data inicial do acidente"
-          />
-        </div>
-        <div className="field">
-          <label htmlFor="accidents-date-to">Data do acidente — Até</label>
-          <input
-            id="accidents-date-to"
-            type="date"
-            value={dateTo}
-            onChange={(e) => setDateTo(e.target.value)}
-            aria-label="Data final do acidente"
-          />
-        </div>
-        <div className="field">
-          <label htmlFor="accidents-sort">Ordenar por</label>
-          <select
-            id="accidents-sort"
-            value={sortKey}
-            onChange={(e) => setSortKey(e.target.value)}
-            aria-label="Ordenar listagem de acidentes"
-          >
-            {ACCIDENTS_SORT_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
-        <button className="btn" type="button" onClick={() => void load(1)}>
-          Filtrar
-        </button>
-        {canWriteAccidents ? (
-          <Link className="btn" to="/accidents/new">
-            Novo registro
-          </Link>
-        ) : null}
-        <button
-          className="btn secondary btn-with-icon"
-          type="button"
-          onClick={clearFilters}
-        >
-          <FilterX size={16} strokeWidth={2} aria-hidden />
-          Limpar filtros
-        </button>
       </div>
 
       {error ? <p className="error">{error}</p> : null}
