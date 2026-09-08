@@ -6,6 +6,7 @@ import {
 import { ClearFiltersButton } from '../../components/ClearFiltersButton';
 import { SearchField } from '../../components/forms/SearchField';
 import { PaginationBar } from '../../components/pagination/PaginationBar';
+import { PaginationSummary } from '../../components/pagination/PaginationSummary';
 import { api } from '../../lib/api';
 import {
   DEFAULT_ACTIVITY_LIST_FILTERS,
@@ -163,6 +164,13 @@ export function ActivityPage() {
 
       {data ? (
         <div className="card table-wrap">
+          <PaginationSummary
+            className="pagination-summary-top"
+            page={data.page}
+            totalPages={data.totalPages}
+            total={data.total}
+            summaryLabel="evento(s)"
+          />
           <table>
             <thead>
               <tr>
