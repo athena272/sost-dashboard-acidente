@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 
 import express, { type Express } from 'express';
+import { assertMongoUriForRuntime } from './assert-mongo-uri';
 import { createNestApp } from './create-app';
 
 /**
@@ -15,6 +16,7 @@ import { createNestApp } from './create-app';
 let cachedServer: Promise<Express> | undefined;
 
 async function createServer(): Promise<Express> {
+  assertMongoUriForRuntime();
   const expressApp = express();
   const nestApp = await createNestApp(expressApp);
   await nestApp.init();
