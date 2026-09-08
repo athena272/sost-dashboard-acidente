@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useId, useState } from 'react';
+import { PaginationSummary } from './PaginationSummary';
 import { clampPage, getVisiblePages } from './paginationRange';
 
 type Props = {
@@ -49,9 +50,12 @@ export function PaginationBar({
 
   return (
     <div className="toolbar pagination-bar" style={{ marginTop: '1rem' }}>
-      <span className="muted">
-        {total} {summaryLabel} — página {safePage} de {safeTotalPages}
-      </span>
+      <PaginationSummary
+        page={safePage}
+        totalPages={safeTotalPages}
+        total={total}
+        summaryLabel={summaryLabel}
+      />
 
       <div className="pagination-controls">
         <button

@@ -308,6 +308,15 @@ th {
   align-items: center;
 }
 
+.pagination-summary {
+  margin: 0;
+}
+
+.pagination-summary-top {
+  margin: 0 0 0.75rem;
+  text-align: left;
+}
+
 .pagination-controls {
   display: flex;
   flex-wrap: wrap;

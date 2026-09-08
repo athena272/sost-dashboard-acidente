@@ -4,6 +4,7 @@ import { acronymLabel } from '@sost/shared';
 import { ClearFiltersButton } from '../../components/ClearFiltersButton';
 import { SearchField } from '../../components/forms/SearchField';
 import { PaginationBar } from '../../components/pagination/PaginationBar';
+import { PaginationSummary } from '../../components/pagination/PaginationSummary';
 import { api } from '../../lib/api';
 import { useAuth } from '../auth/AuthContext';
 import {
@@ -200,6 +201,13 @@ export function AccidentsPage() {
 
       {data ? (
         <div className="card table-wrap">
+          <PaginationSummary
+            className="pagination-summary-top"
+            page={data.page}
+            totalPages={data.totalPages}
+            total={data.total}
+            summaryLabel="registro(s)"
+          />
           <table>
             <thead>
               <tr>

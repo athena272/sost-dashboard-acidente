@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PaginationBar } from '../../components/pagination/PaginationBar';
+import { PaginationSummary } from '../../components/pagination/PaginationSummary';
 import { api } from '../../lib/api';
 import {
   describeDimensionSelection,
@@ -192,6 +193,13 @@ export function StatsAuditDialog({ open, trail, yearQuery, onClose }: Props) {
           {loading ? <p className="muted">Carregando registros…</p> : null}
           {data ? (
             <>
+              <PaginationSummary
+                className="pagination-summary-top"
+                page={data.page}
+                totalPages={data.totalPages}
+                total={data.total}
+                summaryLabel="registro(s)"
+              />
               <div className="table-wrap">
                 <table>
                   <thead>
