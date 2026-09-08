@@ -1,8 +1,12 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PaginationBar } from '../../components/pagination/PaginationBar';
 import { PaginationSummary } from '../../components/pagination/PaginationSummary';
 import { api } from '../../lib/api';
+import {
+  prefersReducedMotion,
+  resolveScrollBehavior,
+} from './resolveScrollBehavior';
 import {
   describeDimensionSelection,
   isContributorKeyCompatible,
@@ -41,6 +45,7 @@ export function StatsAuditDialog({ open, trail, yearQuery, onClose }: Props) {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const recordsSectionRef = useRef<HTMLElement>(null);
 
   const trailSyncId = trail
     ? `${trail.dimension}::${trail.defaultKey ?? ''}::${trail.titulo}`
@@ -167,6 +172,15 @@ export function StatsAuditDialog({ open, trail, yearQuery, onClose }: Props) {
                           onClick={() => {
                             setSelectedKey(bucket.key);
                             setPage(1);
+                            const behavior = resolveScrollBehavior(
+                              prefersReducedMotion(),
+                            );
+                            requestAnimationFrame(() => {
+                              recordsSectionRef.current?.scrollIntoView({
+                                behavior,
+                                block: 'start',
+                              });
+                            });
                           }}
                         >
                           Ver registros
@@ -180,7 +194,7 @@ export function StatsAuditDialog({ open, trail, yearQuery, onClose }: Props) {
           </section>
         ) : null}
 
-        <section className="stack">
+        <section className="stack" ref={recordsSectionRef}>
           <h3>Registros que entram nesta conta</h3>
           <p className="muted">
             {describeDimensionSelection(
