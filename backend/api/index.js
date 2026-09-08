@@ -2,6 +2,7 @@
 // compila os arquivos de `api/` com esbuild, que não emite os metadados de decorator dos
 // quais a injeção de dependências do NestJS depende. Delegando para o `dist/`, gerado pelo
 // `tsc` (pnpm build), os metadados vêm corretos.
+require('reflect-metadata');
 const { getExpressApp } = require('../dist/serverless');
 
 module.exports = async function handler(request, response) {
