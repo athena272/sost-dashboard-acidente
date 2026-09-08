@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { acronymLabel } from '@sost/shared';
 import { api } from '../../lib/api';
+import { useAuth } from '../auth/AuthContext';
 import { AccidentFormFields } from './AccidentFormFields';
 import {
   Accident,
@@ -16,6 +17,8 @@ export function AccidentFormPage() {
   const { id } = useParams();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
+  const { canWriteAccidents } = useAuth();
+  const readOnly = isEdit && !canWriteAccidents;
   const [form, setForm] = useState<AccidentFormValues>(emptyForm());
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(isEdit);
@@ -31,6 +34,7 @@ export function AccidentFormPage() {
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
+    if (readOnly) return;
     setSaving(true);
     setError('');
     try {
@@ -60,22 +64,27 @@ export function AccidentFormPage() {
     <form className="stack" onSubmit={onSubmit}>
       <div>
         <h1>
-          {isEdit ? 'Editar' : 'Novo'} registro de {acronymLabel('CAT')}
+          {readOnly ? 'Detalhes' : isEdit ? 'Editar' : 'Novo'} registro de{' '}
+          {acronymLabel('CAT')}
         </h1>
         <p className="muted">
-          Cadastro organizado de acidentes do {acronymLabel('SOST')}.
+          {readOnly
+            ? `Consulta do registro (perfil Visualizador não altera ${acronymLabel('CAT')}).`
+            : `Cadastro organizado de acidentes do ${acronymLabel('SOST')}.`}
         </p>
       </div>
-      <div className="card">
+      <fieldset className="card form-fieldset" disabled={readOnly}>
         <AccidentFormFields value={form} onChange={setForm} />
-      </div>
+      </fieldset>
       {error ? <p className="error">{error}</p> : null}
       <div className="actions">
-        <button className="btn" type="submit" disabled={saving}>
-          {saving ? 'Salvando…' : 'Salvar'}
-        </button>
+        {readOnly ? null : (
+          <button className="btn" type="submit" disabled={saving}>
+            {saving ? 'Salvando…' : 'Salvar'}
+          </button>
+        )}
         <Link className="btn secondary" to="/accidents">
-          Cancelar
+          {readOnly ? 'Voltar' : 'Cancelar'}
         </Link>
       </div>
     </form>

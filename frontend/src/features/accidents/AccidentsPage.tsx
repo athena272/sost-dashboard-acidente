@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { acronymLabel } from '@sost/shared';
 import { api } from '../../lib/api';
+import { useAuth } from '../auth/AuthContext';
 import { Accident, sexLabel, statusLabel, typeLabel } from './types';
 
 type ListResponse = {
@@ -12,6 +13,7 @@ type ListResponse = {
 };
 
 export function AccidentsPage() {
+  const { canWriteAccidents } = useAuth();
   const [data, setData] = useState<ListResponse | null>(null);
   const [search, setSearch] = useState('');
   const [year, setYear] = useState('');
@@ -79,9 +81,11 @@ export function AccidentsPage() {
         <button className="btn" type="button" onClick={() => void load(1)}>
           Filtrar
         </button>
-        <Link className="btn" to="/accidents/new">
-          Novo registro
-        </Link>
+        {canWriteAccidents ? (
+          <Link className="btn" to="/accidents/new">
+            Novo registro
+          </Link>
+        ) : null}
       </div>
 
       {error ? <p className="error">{error}</p> : null}
@@ -124,16 +128,21 @@ export function AccidentsPage() {
                   <td>{statusLabel(item.status)}</td>
                   <td>
                     <div className="actions">
-                      <Link className="btn secondary" to={`/accidents/${item._id}`}>
-                        Editar
-                      </Link>
-                      <button
-                        className="btn danger"
-                        type="button"
-                        onClick={() => void onDelete(item._id)}
+                      <Link
+                        className="btn secondary"
+                        to={`/accidents/${item._id}`}
                       >
-                        Excluir
-                      </button>
+                        {canWriteAccidents ? 'Editar' : 'Ver'}
+                      </Link>
+                      {canWriteAccidents ? (
+                        <button
+                          className="btn danger"
+                          type="button"
+                          onClick={() => void onDelete(item._id)}
+                        >
+                          Excluir
+                        </button>
+                      ) : null}
                     </div>
                   </td>
                 </tr>
