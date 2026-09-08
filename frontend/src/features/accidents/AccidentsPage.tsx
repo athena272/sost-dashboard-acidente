@@ -1,8 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { FilterX } from 'lucide-react';
 import { acronymLabel } from '@sost/shared';
 import { api } from '../../lib/api';
 import { useAuth } from '../auth/AuthContext';
+import {
+  ACCIDENTS_SORT_OPTIONS,
+  DEFAULT_ACCIDENTS_SORT_KEY,
+  parseAccidentsSortKey,
+} from './accidentsSort';
 import { Accident, sexLabel, statusLabel, typeLabel } from './types';
 
 type ListResponse = {
@@ -26,25 +32,48 @@ export function AccidentsPage() {
   const [year, setYear] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+  const [sortKey, setSortKey] = useState(DEFAULT_ACCIDENTS_SORT_KEY);
   const [page, setPage] = useState(1);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
-  async function load(nextPage = page) {
+  async function load(
+    nextPage = page,
+    overrides?: {
+      search?: string;
+      year?: string;
+      dateFrom?: string;
+      dateTo?: string;
+      sortKey?: string;
+    },
+  ) {
     setLoading(true);
     setError('');
     try {
-      const range = normalizeDateRange(dateFrom.trim(), dateTo.trim());
-      if (range.from !== dateFrom || range.to !== dateTo) {
+      const nextSearch = overrides?.search ?? search;
+      const nextYear = overrides?.year ?? year;
+      const nextDateFrom = overrides?.dateFrom ?? dateFrom;
+      const nextDateTo = overrides?.dateTo ?? dateTo;
+      const nextSortKey = overrides?.sortKey ?? sortKey;
+
+      const range = normalizeDateRange(nextDateFrom.trim(), nextDateTo.trim());
+      if (
+        overrides === undefined &&
+        (range.from !== dateFrom || range.to !== dateTo)
+      ) {
         setDateFrom(range.from);
         setDateTo(range.to);
       }
+
+      const { sortBy, sortOrder } = parseAccidentsSortKey(nextSortKey);
       const params = new URLSearchParams({
         page: String(nextPage),
         limit: '15',
+        sortBy,
+        sortOrder,
       });
-      if (search.trim()) params.set('search', search.trim());
-      if (year.trim()) params.set('year', year.trim());
+      if (nextSearch.trim()) params.set('search', nextSearch.trim());
+      if (nextYear.trim()) params.set('year', nextYear.trim());
       if (range.from) params.set('accidentDateFrom', range.from);
       if (range.to) params.set('accidentDateTo', range.to);
       const result = await api<ListResponse>(`/accidents?${params}`);
@@ -66,6 +95,21 @@ export function AccidentsPage() {
     if (!confirm('Excluir este registro?')) return;
     await api(`/accidents/${id}`, { method: 'DELETE' });
     await load(page);
+  }
+
+  function clearFilters() {
+    setSearch('');
+    setYear('');
+    setDateFrom('');
+    setDateTo('');
+    setSortKey(DEFAULT_ACCIDENTS_SORT_KEY);
+    void load(1, {
+      search: '',
+      year: '',
+      dateFrom: '',
+      dateTo: '',
+      sortKey: DEFAULT_ACCIDENTS_SORT_KEY,
+    });
   }
 
   return (
@@ -119,6 +163,21 @@ export function AccidentsPage() {
             aria-label="Data final do acidente"
           />
         </div>
+        <div className="field">
+          <label htmlFor="accidents-sort">Ordenar por</label>
+          <select
+            id="accidents-sort"
+            value={sortKey}
+            onChange={(e) => setSortKey(e.target.value)}
+            aria-label="Ordenar listagem de acidentes"
+          >
+            {ACCIDENTS_SORT_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
         <button className="btn" type="button" onClick={() => void load(1)}>
           Filtrar
         </button>
@@ -127,6 +186,14 @@ export function AccidentsPage() {
             Novo registro
           </Link>
         ) : null}
+        <button
+          className="btn secondary btn-with-icon"
+          type="button"
+          onClick={clearFilters}
+        >
+          <FilterX size={16} strokeWidth={2} aria-hidden />
+          Limpar filtros
+        </button>
       </div>
 
       {error ? <p className="error">{error}</p> : null}
