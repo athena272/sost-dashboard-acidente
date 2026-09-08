@@ -2,6 +2,7 @@ import { Type } from 'class-transformer';
 import {
   IsDateString,
   IsEnum,
+  IsIn,
   IsInt,
   IsOptional,
   IsString,
@@ -9,6 +10,11 @@ import {
   Min,
 } from 'class-validator';
 import { AccidentType } from '@sost/shared';
+import {
+  ACCIDENT_SORT_FIELDS,
+  type AccidentSortField,
+  type AccidentSortOrder,
+} from '../accident-sort';
 
 export class QueryAccidentsDto {
   @IsOptional()
@@ -52,4 +58,12 @@ export class QueryAccidentsDto {
   @IsOptional()
   @IsString()
   sector?: string;
+
+  @IsOptional()
+  @IsIn([...ACCIDENT_SORT_FIELDS])
+  sortBy?: AccidentSortField;
+
+  @IsOptional()
+  @IsIn(['asc', 'desc'])
+  sortOrder?: AccidentSortOrder;
 }

@@ -5,6 +5,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
 import { AccidentSource } from '@sost/shared';
+import { buildAccidentSortObject } from './accident-sort';
 import { Accident, AccidentDocument } from './accident.schema';
 import { CreateAccidentDto } from './dto/create-accident.dto';
 import { QueryAccidentsDto } from './dto/query-accidents.dto';
@@ -81,10 +82,12 @@ export class AccidentsService {
       }
     }
 
+    const sort = buildAccidentSortObject(query.sortBy, query.sortOrder);
+
     const [items, total] = await Promise.all([
       this.accidentModel
         .find(filter)
-        .sort({ accidentDate: -1, createdAt: -1 })
+        .sort(sort)
         .skip((page - 1) * limit)
         .limit(limit)
         .lean()

@@ -1,3 +1,4 @@
+import { Eye, EyeOff } from 'lucide-react';
 import { useId, useState } from 'react';
 import { FieldShell } from './TextField';
 
@@ -59,8 +60,13 @@ export function PasswordField({
           className="password-toggle"
           onClick={() => setVisible((current) => !current)}
           aria-label={visible ? 'Ocultar senha' : 'Mostrar senha'}
+          aria-pressed={visible}
         >
-          {visible ? 'Ocultar' : 'Mostrar'}
+          {visible ? (
+            <EyeOff size={18} strokeWidth={2} aria-hidden />
+          ) : (
+            <Eye size={18} strokeWidth={2} aria-hidden />
+          )}
         </button>
       </div>
     </FieldShell>

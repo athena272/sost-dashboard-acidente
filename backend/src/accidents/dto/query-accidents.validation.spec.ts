@@ -54,4 +54,36 @@ describe('ValidationPipe + QueryAccidentsDto date range', () => {
       }),
     ).rejects.toBeInstanceOf(BadRequestException);
   });
+
+  it('allows sortBy and sortOrder', async () => {
+    const result = await validate({
+      sortBy: 'createdAt',
+      sortOrder: 'desc',
+    });
+    expect(result).toMatchObject({
+      sortBy: 'createdAt',
+      sortOrder: 'desc',
+    });
+  });
+
+  it('allows AccidentsPage default list query (regression: sortBy/sortOrder should not exist)', async () => {
+    const result = await validate({
+      page: '1',
+      limit: '15',
+      sortBy: 'createdAt',
+      sortOrder: 'desc',
+    });
+    expect(result).toMatchObject({
+      page: 1,
+      limit: 15,
+      sortBy: 'createdAt',
+      sortOrder: 'desc',
+    });
+  });
+
+  it('rejects sortBy outside whitelist', async () => {
+    await expect(
+      validate({ sortBy: 'passwordHash' }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
 });

@@ -39,11 +39,14 @@ export function FieldShell({
           {hint}
         </p>
       ) : null}
-      {error ? (
-        <p id={errorId} className="field-error" role="alert">
-          {error}
-        </p>
-      ) : null}
+      <p
+        id={errorId}
+        className="field-error"
+        role={error ? 'alert' : undefined}
+        aria-hidden={error ? undefined : true}
+      >
+        {error ?? ''}
+      </p>
     </div>
   );
 }
