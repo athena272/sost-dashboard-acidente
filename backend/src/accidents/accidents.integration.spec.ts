@@ -105,6 +105,58 @@ describe('AccidentsService + StatsService (integration)', () => {
     expect(swapped.total).toBe(3);
   });
 
+  it('lists newest createdAt first by default', async () => {
+    await accidentsService.create({
+      company: 'EBSERH',
+      victimName: 'Primeiro',
+      accidentDate: '2024-01-01',
+      emissionYear: 2024,
+      accidentType: AccidentType.Typical,
+    });
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    await accidentsService.create({
+      company: 'EBSERH',
+      victimName: 'Segundo',
+      accidentDate: '2020-01-01',
+      emissionYear: 2020,
+      accidentType: AccidentType.Typical,
+    });
+
+    const result = await accidentsService.findAll({ page: 1, limit: 10 });
+    expect(result.items.map((item) => item.victimName)).toEqual([
+      'Segundo',
+      'Primeiro',
+    ]);
+  });
+
+  it('sorts by victimName ascending when requested', async () => {
+    await accidentsService.create({
+      company: 'EBSERH',
+      victimName: 'Zoe',
+      accidentDate: '2024-01-01',
+      emissionYear: 2024,
+      accidentType: AccidentType.Typical,
+    });
+    await accidentsService.create({
+      company: 'EBSERH',
+      victimName: 'Ana',
+      accidentDate: '2024-06-01',
+      emissionYear: 2024,
+      accidentType: AccidentType.Typical,
+    });
+
+    const result = await accidentsService.findAll({
+      page: 1,
+      limit: 10,
+      sortBy: 'victimName',
+      sortOrder: 'asc',
+    });
+    expect(result.items.map((item) => item.victimName)).toEqual([
+      'Ana',
+      'Zoe',
+    ]);
+  });
+
   it('aggregates overview stats', async () => {
     await accidentsService.create({
       company: 'EBSERH',
