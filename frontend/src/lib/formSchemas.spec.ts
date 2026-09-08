@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { AccidentType } from '@sost/shared';
 import {
   accidentFormSchema,
+  editorRequestSchema,
   loginSchema,
   registerSchema,
 } from './formSchemas';
@@ -104,6 +105,24 @@ describe('accidentFormSchema', () => {
 
   it('accepts a minimal valid accident', () => {
     const result = accidentFormSchema.safeParse(validAccident);
+    expect(result.success).toBe(true);
+  });
+});
+
+describe('editorRequestSchema', () => {
+  it('requires name with at least 2 characters', () => {
+    const result = editorRequestSchema.safeParse({ name: 'A' });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0]?.message).toContain('nome');
+    }
+  });
+
+  it('accepts name and optional message', () => {
+    const result = editorRequestSchema.safeParse({
+      name: 'Maria Silva',
+      message: 'Preciso cadastrar CATs',
+    });
     expect(result.success).toBe(true);
   });
 });
