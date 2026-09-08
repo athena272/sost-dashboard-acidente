@@ -6,6 +6,7 @@ import {
 } from '@sost/shared';
 import { ClearFiltersButton } from '../../components/ClearFiltersButton';
 import { SearchField } from '../../components/forms/SearchField';
+import { PaginationBar } from '../../components/pagination/PaginationBar';
 import { api } from '../../lib/api';
 import {
   DEFAULT_USERS_LIST_FILTERS,
@@ -240,27 +241,13 @@ export function UsersPage() {
               })}
             </tbody>
           </table>
-          <div className="toolbar" style={{ marginTop: '1rem' }}>
-            <span className="muted">
-              {data.total} usuário(s) — página {data.page} de {data.totalPages}
-            </span>
-            <button
-              className="btn secondary"
-              type="button"
-              disabled={page <= 1}
-              onClick={() => void load(page - 1)}
-            >
-              Anterior
-            </button>
-            <button
-              className="btn secondary"
-              type="button"
-              disabled={page >= data.totalPages}
-              onClick={() => void load(page + 1)}
-            >
-              Próxima
-            </button>
-          </div>
+          <PaginationBar
+            page={data.page}
+            totalPages={data.totalPages}
+            total={data.total}
+            summaryLabel="usuário(s)"
+            onPageChange={(next) => void load(next)}
+          />
         </div>
       ) : null}
     </div>
