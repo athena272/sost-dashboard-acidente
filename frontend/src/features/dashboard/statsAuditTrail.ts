@@ -12,6 +12,8 @@ export type MonthBucket = { year: number; month: number; count: number };
 
 export type StatsMeta = {
   year: number | null;
+  yearFrom?: number | null;
+  yearTo?: number | null;
   yearFilter: string;
   formula: string;
   excludeEmpty: string;
