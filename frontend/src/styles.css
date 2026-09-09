@@ -263,6 +263,10 @@ th {
   color: var(--muted);
 }
 
+.muted a {
+  font-weight: 900;
+}
+
 .error {
   color: var(--danger);
 }
