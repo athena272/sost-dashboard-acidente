@@ -13,6 +13,7 @@ import { ActivityLogsService } from '../activity-logs/activity-logs.service';
 import { CurrentUser, type AuthUser } from '../auth/current-user.decorator';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
+import { MailService } from '../mail/mail.service';
 import { CreateEditorRequestDto } from './dto/create-editor-request.dto';
 import { QueryEditorRequestsDto } from './dto/query-editor-requests.dto';
 import { UpdatePendingEditorRequestDto } from './dto/update-pending-editor-request.dto';
@@ -24,6 +25,7 @@ export class EditorRequestsController {
   constructor(
     private readonly editorRequestsService: EditorRequestsService,
     private readonly activityLogs: ActivityLogsService,
+    private readonly mailService: MailService,
   ) {}
 
   @Post('editor-requests')
@@ -45,6 +47,12 @@ export class EditorRequestsController {
       actorUserId: user.userId,
       actorUsername: user.username,
       details: { message: dto.message, name: dto.name },
+    });
+    void this.mailService.notifyNewEditorRequest({
+      username: user.username,
+      name: dto.name,
+      message: dto.message,
+      requestId: String(request.id),
     });
     return request;
   }
