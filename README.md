@@ -108,6 +108,7 @@ O `frontend/vercel.json` já define install/build com o monorepo + `shared`.
   - `MONGODB_URI` (Atlas Free M0)
   - `JWT_SECRET`
   - `ADMIN_USERNAME` / `ADMIN_PASSWORD` (opcional)
+  - `RESEND_API_KEY`, `MAIL_FROM`, `ADMIN_NOTIFICATION_EMAILS` (alerta HTML ao criar pedido de Editor; lista separada por vírgula)
 
 O `backend/vercel.json` builda `shared` + Nest (`tsc`). O handler `api/index.js` (JavaScript puro) carrega `dist/serverless` para preservar metadados de decorator; `public/` é só a página estática mínima exigida pela Vercel sem framework.
 
