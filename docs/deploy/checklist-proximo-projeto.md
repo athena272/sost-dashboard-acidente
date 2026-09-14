@@ -26,6 +26,7 @@ Use ao criar um projeto semelhante a este.
 - [ ] Pasta `public/` com HTML mínimo (output estático)
 - [ ] Se houver pacote workspace fora do Root Directory: **vendor** no build + `includeFiles`
 - [ ] Env Production: `MONGODB_URI`, `JWT_SECRET` (URI **não** localhost)
+- [ ] Se houver alerta por e-mail: `RESEND_API_KEY`, `MAIL_FROM`, `ADMIN_NOTIFICATION_EMAILS` (lista CSV)
 - [ ] Após deploy: testar `OPTIONS` e `POST` de login nos **logs da função**, não só no console do browser
 
 ## Projeto Vercel — Frontend
