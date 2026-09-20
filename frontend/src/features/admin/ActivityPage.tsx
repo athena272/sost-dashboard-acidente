@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
+import { History } from 'lucide-react';
 import {
   ACTIVITY_ACTION_LABELS,
   ActivityAction,
 } from '@sost/shared';
 import { ClearFiltersButton } from '../../components/ClearFiltersButton';
 import { SearchField } from '../../components/forms/SearchField';
+import { PageHeader } from '../../components/layout/PageHeader';
 import { PaginationBar } from '../../components/pagination/PaginationBar';
 import { PaginationSummary } from '../../components/pagination/PaginationSummary';
 import { api } from '../../lib/api';
@@ -87,12 +89,15 @@ export function ActivityPage() {
 
   return (
     <div className="stack">
-      <div>
-        <h1>Histórico de atividades</h1>
-        <p className="muted">
-          Log das ações relevantes do sistema (login, cadastros, alterações de perfil e acidentes).
-        </p>
-      </div>
+      <PageHeader
+        icon={History}
+        title="Histórico de atividades"
+        description={
+          <p className="muted">
+            Log das ações relevantes do sistema (login, cadastros, alterações de perfil e acidentes).
+          </p>
+        }
+      />
 
       <div className="card toolbar">
         <div className="toolbar-search">

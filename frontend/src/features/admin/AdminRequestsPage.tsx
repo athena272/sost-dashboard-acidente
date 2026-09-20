@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Inbox } from 'lucide-react';
 import {
   EDITOR_REQUEST_STATUS_LABELS,
   EditorRequestStatus,
@@ -6,6 +7,7 @@ import {
   UserRole,
 } from '@sost/shared';
 import { ClearFiltersButton } from '../../components/ClearFiltersButton';
+import { PageHeader } from '../../components/layout/PageHeader';
 import { api } from '../../lib/api';
 import {
   DEFAULT_ADMIN_REQUESTS_STATUS,
@@ -75,13 +77,16 @@ export function AdminRequestsPage() {
 
   return (
     <div className="stack">
-      <div>
-        <h1>Pedidos de {ROLE_LABELS[UserRole.Editor]}</h1>
-        <p className="muted">
-          Aprove ou rejeite solicitações de Visualizadores que precisam cadastrar e
-          alterar registros.
-        </p>
-      </div>
+      <PageHeader
+        icon={Inbox}
+        title={`Pedidos de ${ROLE_LABELS[UserRole.Editor]}`}
+        description={
+          <p className="muted">
+            Aprove ou rejeite solicitações de Visualizadores que precisam cadastrar e
+            alterar registros.
+          </p>
+        }
+      />
 
       <div className="card toolbar">
         <div className="toolbar-controls">
