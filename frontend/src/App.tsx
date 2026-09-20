@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Navigate, NavLink, Outlet, Route, Routes } from "react-router-dom";
+import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
-import { acronymLabel, ROLE_DESCRIPTIONS, ROLE_LABELS } from "@sost/shared";
+import { AppHeader } from "./components/layout/AppHeader";
 import { api } from "./lib/api";
 import { useAuth } from "./features/auth/AuthContext";
 import { LoginPage } from "./features/auth/LoginPage";
@@ -67,46 +67,13 @@ function ProtectedLayout() {
 
   return (
     <div className="app-shell">
-      <header className="topbar">
-        <div className="brand">
-          <strong>{acronymLabel("SOST")}</strong>
-          <span>Dashboard de acidentes</span>
-        </div>
-        <nav className="nav">
-          <NavLink to="/" end>
-            Dashboard
-          </NavLink>
-          <NavLink to="/accidents">Registros</NavLink>
-          {canWriteAccidents ? (
-            <NavLink to="/accidents/new">Novo</NavLink>
-          ) : null}
-          <NavLink to="/profile">Perfil</NavLink>
-          {isAdmin ? (
-            <>
-              <NavLink to="/users">Usuários</NavLink>
-              <NavLink to="/admin/requests" className="nav-with-badge">
-                Pedidos
-                {pendingRequests > 0 ? (
-                  <span
-                    className="badge"
-                    aria-label={`${pendingRequests} pendentes`}
-                  >
-                    {pendingRequests}
-                  </span>
-                ) : null}
-              </NavLink>
-              <NavLink to="/activity">Histórico</NavLink>
-            </>
-          ) : null}
-          <span className="role-chip" title={ROLE_DESCRIPTIONS[user.role]}>
-            {user.username}
-            <small>{ROLE_LABELS[user.role]}</small>
-          </span>
-          <button className="btn secondary" type="button" onClick={logout}>
-            Sair
-          </button>
-        </nav>
-      </header>
+      <AppHeader
+        user={user}
+        canWriteAccidents={canWriteAccidents}
+        isAdmin={isAdmin}
+        pendingRequests={pendingRequests}
+        onLogout={logout}
+      />
       <main className="content">
         <Outlet />
       </main>

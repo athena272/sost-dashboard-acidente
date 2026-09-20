@@ -7,8 +7,10 @@ import {
   ROLE_LABELS,
   UserRole,
 } from '@sost/shared';
+import { User } from 'lucide-react';
 import { TextAreaField } from '../../components/forms/TextAreaField';
 import { TextField } from '../../components/forms/TextField';
+import { PageHeader } from '../../components/layout/PageHeader';
 import { api } from '../../lib/api';
 import { getZodFieldErrors } from '../../lib/formErrors';
 import { editorRequestSchema, profileSchema } from '../../lib/formSchemas';
@@ -160,13 +162,18 @@ export function ProfilePage() {
 
   return (
     <div className="stack">
-      <div>
-        <h1>Meu perfil</h1>
-        <p className="muted">
-          Perfil atual: <strong>{ROLE_LABELS[user.role]}</strong>
-        </p>
-        <p className="muted">{ROLE_DESCRIPTIONS[user.role]}</p>
-      </div>
+      <PageHeader
+        icon={User}
+        title="Meu perfil"
+        description={
+          <>
+            <p className="muted">
+              Perfil atual: <strong>{ROLE_LABELS[user.role]}</strong>
+            </p>
+            <p className="muted">{ROLE_DESCRIPTIONS[user.role]}</p>
+          </>
+        }
+      />
 
       <form className="card stack" onSubmit={onSaveProfile} noValidate>
         <TextField

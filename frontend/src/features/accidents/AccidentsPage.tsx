@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
+import { ClipboardList, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { acronymLabel } from '@sost/shared';
 import { ClearFiltersButton } from '../../components/ClearFiltersButton';
 import { SearchField } from '../../components/forms/SearchField';
+import { PageHeader } from '../../components/layout/PageHeader';
 import { PaginationBar } from '../../components/pagination/PaginationBar';
 import { PaginationSummary } from '../../components/pagination/PaginationSummary';
 import { api } from '../../lib/api';
@@ -117,12 +119,15 @@ export function AccidentsPage() {
 
   return (
     <div className="stack">
-      <div>
-        <h1>Registros de {acronymLabel('CAT')}</h1>
-        <p className="muted">
-          Lista filtrável dos acidentes acompanhados pelo {acronymLabel('SOST')}.
-        </p>
-      </div>
+      <PageHeader
+        icon={ClipboardList}
+        title={`Registros de ${acronymLabel('CAT')}`}
+        description={
+          <p className="muted">
+            Lista filtrável dos acidentes acompanhados pelo {acronymLabel('SOST')}.
+          </p>
+        }
+      />
 
       <div className="card toolbar">
         <div className="toolbar-search">
@@ -189,6 +194,7 @@ export function AccidentsPage() {
           </button>
           {canWriteAccidents ? (
             <Link className="btn" to="/accidents/new">
+              <Plus size={16} strokeWidth={2} aria-hidden />
               Novo registro
             </Link>
           ) : null}

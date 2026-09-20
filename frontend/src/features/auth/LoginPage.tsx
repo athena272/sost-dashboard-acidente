@@ -1,11 +1,13 @@
 import type { FormEvent } from 'react';
 import { useState } from 'react';
+import { LogIn } from 'lucide-react';
 import { Link, Navigate } from 'react-router-dom';
 import { acronymLabel } from '@sost/shared';
 import { PasswordField } from '../../components/forms/PasswordField';
 import { TextField } from '../../components/forms/TextField';
 import { getZodFieldErrors } from '../../lib/formErrors';
 import { loginSchema } from '../../lib/formSchemas';
+import { AuthLayout } from './AuthLayout';
 import { useAuth } from './AuthContext';
 
 export function LoginPage() {
@@ -38,12 +40,13 @@ export function LoginPage() {
   }
 
   return (
-    <div className="login-page">
+    <AuthLayout>
       <form className="card login-card stack" onSubmit={onSubmit} noValidate>
         <div>
-          <h1>{acronymLabel('SOST')}</h1>
+          <h1>Entrar</h1>
           <p className="muted">
-            Dashboard de acidentes — acesso com usuário e senha.
+            Dashboard de acidentes — acesso com usuário e senha ao{' '}
+            {acronymLabel('SOST')}.
           </p>
         </div>
         <TextField
@@ -68,12 +71,19 @@ export function LoginPage() {
         />
         {error ? <p className="error">{error}</p> : null}
         <button className="btn" type="submit" disabled={submitting}>
-          {submitting ? 'Entrando…' : 'Entrar'}
+          {submitting ? (
+            'Entrando…'
+          ) : (
+            <>
+              <LogIn size={16} strokeWidth={2} aria-hidden />
+              Entrar
+            </>
+          )}
         </button>
         <p className="muted">
           Ainda não tem conta? <Link to="/register">Cadastre-se</Link>
         </p>
       </form>
-    </div>
+    </AuthLayout>
   );
 }

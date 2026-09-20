@@ -1,11 +1,13 @@
 import type { FormEvent } from 'react';
 import { useState } from 'react';
+import { UserPlus } from 'lucide-react';
 import { Link, Navigate } from 'react-router-dom';
 import { acronymLabel, ROLE_DESCRIPTIONS, ROLE_LABELS, UserRole } from '@sost/shared';
 import { PasswordField } from '../../components/forms/PasswordField';
 import { TextField } from '../../components/forms/TextField';
 import { getZodFieldErrors } from '../../lib/formErrors';
 import { registerSchema } from '../../lib/formSchemas';
+import { AuthLayout } from './AuthLayout';
 import { useAuth } from './AuthContext';
 
 export function RegisterPage() {
@@ -47,7 +49,7 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="login-page">
+    <AuthLayout>
       <form className="card login-card stack" onSubmit={onSubmit} noValidate>
         <div>
           <h1>Criar conta</h1>
@@ -92,12 +94,19 @@ export function RegisterPage() {
         </p>
         {error ? <p className="error">{error}</p> : null}
         <button className="btn" type="submit" disabled={submitting}>
-          {submitting ? 'Cadastrando…' : 'Cadastrar'}
+          {submitting ? (
+            'Cadastrando…'
+          ) : (
+            <>
+              <UserPlus size={16} strokeWidth={2} aria-hidden />
+              Cadastrar
+            </>
+          )}
         </button>
         <p className="muted">
           Já tem conta? <Link to="/login">Entrar</Link>
         </p>
       </form>
-    </div>
+    </AuthLayout>
   );
 }

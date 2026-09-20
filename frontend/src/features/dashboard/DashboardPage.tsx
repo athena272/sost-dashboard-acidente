@@ -11,9 +11,18 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import { Database, Layers, LayoutDashboard, Stethoscope } from 'lucide-react';
 import { acronymLabel } from '@sost/shared';
+import { PageHeader } from '../../components/layout/PageHeader';
 import { api } from '../../lib/api';
 import { StatsAuditButton, StatsAuditDialog } from './StatsAuditDialog';
+import { KpiCard } from './KpiCard';
+import {
+  CHART_COLORS,
+  chartAxisTick,
+  chartGridProps,
+  chartTooltipStyle,
+} from './chartTheme';
 import {
   buildStatsAuditTrail,
   labelSex,
@@ -143,14 +152,17 @@ export function DashboardPage() {
 
   return (
     <div className="stack">
-      <div>
-        <h1>Dashboard — {acronymLabel('SOST')}</h1>
-        <p className="muted">
-          Evolução mensal de acidentes, funções, {acronymLabel('CID')} e tipos
-          (típico / trajeto / doença ocupacional). Use “Como chegamos nisto”
-          para ver a trilha de cálculo e os registros brutos.
-        </p>
-      </div>
+      <PageHeader
+        icon={LayoutDashboard}
+        title={`Dashboard — ${acronymLabel('SOST')}`}
+        description={
+          <p className="muted">
+            Evolução mensal de acidentes, funções, {acronymLabel('CID')} e tipos
+            (típico / trajeto / doença ocupacional). Use “Como chegamos nisto”
+            para ver a trilha de cálculo e os registros brutos.
+          </p>
+        }
+      />
 
       <div className="card toolbar">
         {yearMode === 'single' ? (
@@ -254,30 +266,30 @@ export function DashboardPage() {
       {data ? (
         <>
           <div className="grid-3">
-            <div className="card stack">
-              <div className="kpi-head">
-                <div className="muted">Total de registros</div>
-                <StatsAuditButton onClick={() => openAudit('total')} />
-              </div>
-              <div className="stat">{data.total}</div>
-            </div>
-            <div className="card stack">
-              <div className="kpi-head">
-                <div className="muted">Tipos distintos</div>
-                <StatsAuditButton onClick={() => openAudit('distinctTypes')} />
-              </div>
-              <div className="stat">{data.distinctTypes}</div>
-            </div>
-            <div className="card stack">
-              <div className="kpi-head">
-                <div className="muted">{acronymLabel('CID')} distintos</div>
-                <StatsAuditButton onClick={() => openAudit('distinctCids')} />
-              </div>
-              <div className="stat">{data.distinctCids}</div>
-            </div>
+            <KpiCard
+              variant="total"
+              icon={Database}
+              label="Total de registros"
+              value={data.total}
+              onAudit={() => openAudit('total')}
+            />
+            <KpiCard
+              variant="types"
+              icon={Layers}
+              label="Tipos distintos"
+              value={data.distinctTypes}
+              onAudit={() => openAudit('distinctTypes')}
+            />
+            <KpiCard
+              variant="cids"
+              icon={Stethoscope}
+              label={`${acronymLabel('CID')} distintos`}
+              value={data.distinctCids}
+              onAudit={() => openAudit('distinctCids')}
+            />
           </div>
 
-          <div className="card stack">
+          <div className="card stack chart-card">
             <div className="kpi-head">
               <h2>Evolução mês a mês</h2>
               <StatsAuditButton onClick={() => openAudit('byMonth')} />
@@ -285,17 +297,19 @@ export function DashboardPage() {
             <div style={{ width: '100%', height: 280 }}>
               <ResponsiveContainer>
                 <LineChart data={monthSeries}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="label" />
-                  <YAxis allowDecimals={false} />
-                  <Tooltip />
+                  <CartesianGrid {...chartGridProps} />
+                  <XAxis dataKey="label" tick={chartAxisTick} />
+                  <YAxis allowDecimals={false} tick={chartAxisTick} />
+                  <Tooltip contentStyle={chartTooltipStyle} />
                   <Legend />
                   <Line
                     type="monotone"
                     dataKey="count"
                     name="Acidentes"
-                    stroke="#0b5f6b"
-                    strokeWidth={2}
+                    stroke={CHART_COLORS.brand}
+                    strokeWidth={2.5}
+                    dot={{ r: 3, fill: CHART_COLORS.brand }}
+                    activeDot={{ r: 5 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -366,7 +380,7 @@ function ChartCard({
   onAudit: () => void;
 }) {
   return (
-    <div className="card stack">
+    <div className="card stack chart-card">
       <div className="kpi-head">
         <h2>{title}</h2>
         <StatsAuditButton onClick={onAudit} />
@@ -374,11 +388,16 @@ function ChartCard({
       <div style={{ width: '100%', height: 260 }}>
         <ResponsiveContainer>
           <BarChart data={data.slice(0, 10)} layout="vertical" margin={{ left: 24 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis type="number" allowDecimals={false} />
-            <YAxis type="category" dataKey="name" width={120} />
-            <Tooltip />
-            <Bar dataKey="count" name="Quantidade" fill="#0b5f6b" />
+            <CartesianGrid {...chartGridProps} />
+            <XAxis type="number" allowDecimals={false} tick={chartAxisTick} />
+            <YAxis type="category" dataKey="name" width={120} tick={chartAxisTick} />
+            <Tooltip contentStyle={chartTooltipStyle} />
+            <Bar
+              dataKey="count"
+              name="Quantidade"
+              fill={CHART_COLORS.brand}
+              radius={[0, 6, 6, 0]}
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>

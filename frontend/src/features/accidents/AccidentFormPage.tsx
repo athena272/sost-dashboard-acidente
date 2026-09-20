@@ -1,7 +1,9 @@
 import type { FormEvent } from "react";
 import { useEffect, useState } from "react";
+import { ClipboardPen, FilePlus, FileText } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { acronymLabel } from "@sost/shared";
+import { PageHeader } from "../../components/layout/PageHeader";
 import { api } from "../../lib/api";
 import { useAuth } from "../auth/AuthContext";
 import { AccidentFormFields } from "./AccidentFormFields";
@@ -69,19 +71,21 @@ export function AccidentFormPage() {
 
   if (loading) return <p className="muted">Carregando…</p>;
 
+  const formIcon = readOnly ? FileText : isEdit ? ClipboardPen : FilePlus;
+
   return (
     <form className="stack" onSubmit={onSubmit} noValidate>
-      <div>
-        <h1>
-          {readOnly ? "Detalhes" : isEdit ? "Editar" : "Novo"} registro de{" "}
-          {acronymLabel("CAT")}
-        </h1>
-        <p className="muted">
-          {readOnly
-            ? `Consulta do registro (perfil Visualizador não altera ${acronymLabel("CAT")}).`
-            : `Cadastro organizado de acidentes do ${acronymLabel("SOST")}. Campos marcados como (obrigatório) precisam ser preenchidos.`}
-        </p>
-      </div>
+      <PageHeader
+        icon={formIcon}
+        title={`${readOnly ? "Detalhes" : isEdit ? "Editar" : "Novo"} registro de ${acronymLabel("CAT")}`}
+        description={
+          <p className="muted">
+            {readOnly
+              ? `Consulta do registro (perfil Visualizador não altera ${acronymLabel("CAT")}).`
+              : `Cadastro organizado de acidentes do ${acronymLabel("SOST")}. Campos marcados como (obrigatório) precisam ser preenchidos.`}
+          </p>
+        }
+      />
       <fieldset className="card form-fieldset" disabled={readOnly}>
         <AccidentFormFields
           value={form}
