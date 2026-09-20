@@ -1,12 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="SOST">
-  <rect width="32" height="32" rx="6" fill="#0b5f6b"/>
-  <text
-    x="16"
-    y="22"
-    text-anchor="middle"
-    font-family="IBM Plex Sans, Segoe UI, Arial, sans-serif"
-    font-size="16"
-    font-weight="700"
-    fill="#ffffff"
-  >S</text>
+  <rect width="32" height="32" rx="7" fill="#0b5f6b"/>
+  <path fill="#ffffff" d="M9 16.9c0-4.75 3.2-8.4 7-8.4s7 3.65 7 8.4H9Z"/>
+  <path fill="#ffffff" d="M7.15 16.55h17.7l-.7 1.85-3.15-.85-2.15 1.35h-5.8l-2.15-1.35-3.15.85Z"/>
+  <path fill="#0b5f6b" d="M10.15 15.05 12.7 16.8l1.55-1.25 1.75 1.45 1.55-1.45 1.75 1.25 2.5-1.75.15 1.55-2.65 1.15-1.45-1.05-1.85 1.4-1.85-1.4-1.45 1.05-2.65-1.15Z"/>
+  <rect x="14.35" y="18.7" width="3.3" height="7.2" rx=".45" fill="#ffffff"/>
+  <rect x="11.15" y="21.25" width="9.7" height="3.25" rx=".45" fill="#ffffff"/>
 </svg>
