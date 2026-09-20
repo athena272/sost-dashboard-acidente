@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Users } from 'lucide-react';
 import {
   ROLE_DESCRIPTIONS,
   ROLE_LABELS,
@@ -6,6 +7,7 @@ import {
 } from '@sost/shared';
 import { ClearFiltersButton } from '../../components/ClearFiltersButton';
 import { SearchField } from '../../components/forms/SearchField';
+import { PageHeader } from '../../components/layout/PageHeader';
 import { PaginationBar } from '../../components/pagination/PaginationBar';
 import { PaginationSummary } from '../../components/pagination/PaginationSummary';
 import { api } from '../../lib/api';
@@ -101,13 +103,16 @@ export function UsersPage() {
 
   return (
     <div className="stack">
-      <div>
-        <h1>Usuários</h1>
-        <p className="muted">
-          Busque e gerencie perfis Visualizador e Editor de registros. O Administrador não pode ser
-          rebaixado por esta tela.
-        </p>
-      </div>
+      <PageHeader
+        icon={Users}
+        title="Usuários"
+        description={
+          <p className="muted">
+            Busque e gerencie perfis Visualizador e Editor de registros. O Administrador não pode ser
+            rebaixado por esta tela.
+          </p>
+        }
+      />
 
       <div className="card toolbar">
         <div className="toolbar-search">
