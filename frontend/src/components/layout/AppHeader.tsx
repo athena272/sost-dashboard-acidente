@@ -1,32 +1,13 @@
-import {
-  ClipboardList,
-  History,
-  Inbox,
-  LayoutDashboard,
-  LogOut,
-  Plus,
-  User,
-  Users,
-  type LucideIcon,
-} from 'lucide-react';
-import { NavLink } from 'react-router-dom';
+import { useEffect, useId, useState } from 'react';
+import { LogOut, Menu, X } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import {
   ROLE_DESCRIPTIONS,
   ROLE_LABELS,
   type UserRole,
 } from '@sost/shared';
 import { BrandMark } from '../brand/BrandMark';
-import { getNavItems, type NavItemId } from './navItems';
-
-const NAV_ICONS: Record<NavItemId, LucideIcon> = {
-  dashboard: LayoutDashboard,
-  accidents: ClipboardList,
-  new: Plus,
-  profile: User,
-  users: Users,
-  requests: Inbox,
-  activity: History,
-};
+import { AppNavLinks } from './AppNavLinks';
 
 type AppHeaderProps = {
   user: {
@@ -46,34 +27,63 @@ export function AppHeader({
   pendingRequests,
   onLogout,
 }: AppHeaderProps) {
-  const items = getNavItems({ canWriteAccidents, isAdmin });
+  const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
+  const navPanelId = useId();
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [menuOpen]);
+
+  const closeMenu = () => setMenuOpen(false);
+  const toggleMenu = () => setMenuOpen((open) => !open);
 
   return (
-    <header className="topbar">
-      <BrandMark />
-      <nav className="nav">
-        {items.map((item) => {
-          const Icon = NAV_ICONS[item.id];
-          return (
-            <NavLink
-              key={item.id}
-              to={item.to}
-              end={item.end}
-              className={item.showBadge ? 'nav-with-badge' : undefined}
-            >
-              <Icon size={16} strokeWidth={2} aria-hidden />
-              {item.label}
-              {item.showBadge && pendingRequests > 0 ? (
-                <span
-                  className="badge"
-                  aria-label={`${pendingRequests} pendentes`}
-                >
-                  {pendingRequests}
-                </span>
-              ) : null}
-            </NavLink>
-          );
-        })}
+    <header className={`topbar${menuOpen ? ' topbar--menu-open' : ''}`}>
+      <div className="topbar-bar">
+        <BrandMark />
+        <button
+          className="topbar-toggle btn secondary btn-with-icon"
+          type="button"
+          aria-expanded={menuOpen}
+          aria-controls={navPanelId}
+          aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
+          onClick={toggleMenu}
+        >
+          {menuOpen ? (
+            <X size={18} strokeWidth={2} aria-hidden />
+          ) : (
+            <Menu size={18} strokeWidth={2} aria-hidden />
+          )}
+          <span className="topbar-toggle-label">
+            {menuOpen ? 'Fechar' : 'Menu'}
+          </span>
+        </button>
+      </div>
+
+      <nav
+        id={navPanelId}
+        className={`nav nav-panel${menuOpen ? ' nav-panel--open' : ''}`}
+      >
+        <AppNavLinks
+          canWriteAccidents={canWriteAccidents}
+          isAdmin={isAdmin}
+          pendingRequests={pendingRequests}
+          onNavigate={closeMenu}
+        />
         <span className="role-chip" title={ROLE_DESCRIPTIONS[user.role]}>
           {user.username}
           <small>{ROLE_LABELS[user.role]}</small>

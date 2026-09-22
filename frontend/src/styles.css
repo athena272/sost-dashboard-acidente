@@ -81,6 +81,18 @@ h3 {
   z-index: 10;
 }
 
+.topbar-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.topbar-toggle {
+  display: none;
+}
+
 .brand {
   display: flex;
   flex-direction: row;
@@ -185,6 +197,79 @@ h3 {
   .grid-2,
   .grid-3 {
     grid-template-columns: 1fr;
+  }
+
+  .topbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 0.65rem 1rem;
+    background: #fff;
+    box-shadow: none;
+  }
+
+  .topbar-bar {
+    width: 100%;
+  }
+
+  .topbar-bar .brand,
+  .topbar-bar .brand-text {
+    min-width: 0;
+  }
+
+  .topbar-toggle {
+    display: inline-flex;
+    flex-shrink: 0;
+  }
+
+  .topbar-toggle-label {
+    font-size: 0.85rem;
+  }
+
+  .topbar .brand span {
+    display: none;
+  }
+
+  .topbar .brand-mark-img {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .topbar .brand strong {
+    font-size: 0.95rem;
+    line-height: 1.25;
+  }
+
+  .nav {
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    flex-wrap: nowrap;
+    gap: 0.35rem;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--line);
+    background: #fff;
+  }
+
+  .nav.nav-panel--open {
+    display: flex;
+  }
+
+  .nav a {
+    justify-content: flex-start;
+    border-radius: 0.55rem;
+    padding: 0.55rem 0.75rem;
+  }
+
+  .nav .role-chip {
+    align-self: stretch;
+    justify-content: space-between;
+  }
+
+  .nav .btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 
