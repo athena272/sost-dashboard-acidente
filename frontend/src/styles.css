@@ -89,7 +89,8 @@ h3 {
   min-width: 0;
 }
 
-.topbar-toggle {
+/* Higher specificity than `.btn` / `.btn-with-icon` so the toggle stays hidden on desktop. */
+.topbar .topbar-toggle {
   display: none;
 }
 
@@ -217,7 +218,7 @@ h3 {
     min-width: 0;
   }
 
-  .topbar-toggle {
+  .topbar .topbar-toggle {
     display: inline-flex;
     flex-shrink: 0;
   }
