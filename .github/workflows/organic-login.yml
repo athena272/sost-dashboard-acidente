@@ -4,10 +4,11 @@
 #   ORGANIC_USERNAME     — usuário (ex.: carlos_machado)
 #   ORGANIC_PASSWORD     — senha desse usuário
 #
-# 4 janelas (horário de Brasília ≈ UTC−3), cada uma com jitter no script:
-#   ~09:00 | ~11:30 | ~14:00 | ~17:00
-# Com ~20% de chance de pular uma janela → em média 3–4 logins/dia.
+# 5 janelas (horário de Brasília ≈ UTC−3), cada uma com jitter no script:
+#   ~09:00 | ~11:30 | ~14:00 | ~17:00 | ~18:00
+# Com ~20% de chance de pular uma janela → em média ~4 logins/dia (faixa típica 3–5).
 #
+# Actions em @v7 (runtime Node 24) para evitar o aviso de Node.js 20 deprecated.
 # Rode também manualmente: Actions → Organic login → Run workflow
 
 name: Organic login
@@ -18,6 +19,7 @@ on:
     - cron: '30 14 * * *' # ~11:30 BRT
     - cron: '0 17 * * *' # ~14:00 BRT
     - cron: '0 20 * * *' # ~17:00 BRT
+    - cron: '0 21 * * *' # ~18:00 BRT (noite / fim do expediente)
   workflow_dispatch:
 
 concurrency:
@@ -30,10 +32,10 @@ jobs:
     timeout-minutes: 50
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
-      - name: Setup Node
-        uses: actions/setup-node@v5
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v7
         with:
           node-version: '24'
 

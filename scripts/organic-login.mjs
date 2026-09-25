@@ -3,7 +3,7 @@
  * Cada login bem-sucedido gera um evento auth.login no histórico.
  *
  * O workflow dispara várias vezes ao dia; este script faz 1 login por execução,
- * com atraso aleatório e chance de pular (para variar entre ~3 e 4 logins/dia).
+ * com atraso aleatório e chance de pular (para variar entre ~3 e 5 logins/dia).
  *
  * Uso local:
  *   ORGANIC_API_URL=https://api-sost-dashboard.vercel.app \
