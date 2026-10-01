@@ -2,6 +2,7 @@
   "name": "sost-dashboard-acidente",
   "private": true,
   "version": "0.1.0",
+  "license": "SEE LICENSE IN LICENSE",
   "packageManager": "pnpm@11.25.0",
   "scripts": {
     "dev": "pnpm --filter @sost/shared build && pnpm -r --parallel --filter @sost/backend --filter @sost/frontend dev",

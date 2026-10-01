@@ -2,6 +2,7 @@
   "name": "@sost/backend",
   "version": "0.1.0",
   "private": true,
+  "license": "SEE LICENSE IN LICENSE",
   "scripts": {
     "dev": "nest start --watch",
     "build": "tsc -p tsconfig.build.json",
