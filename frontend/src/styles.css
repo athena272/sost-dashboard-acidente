@@ -60,10 +60,22 @@ h3 {
   margin: 0 0 0.5rem;
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .app-shell {
   min-height: 100vh;
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto 1fr auto;
 }
 
 .topbar {
@@ -166,6 +178,82 @@ h3 {
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
+}
+
+.app-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.25rem 1.5rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.app-footer p {
+  margin: 0;
+}
+
+.app-footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.app-footer-link {
+  display: inline-flex;
+  border-radius: 0.4rem;
+  transition: transform var(--ease), opacity var(--ease);
+}
+
+.app-footer-link:hover {
+  transform: translateY(-2px);
+  opacity: 0.8;
+}
+
+.app-footer-link:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+
+.app-footer-credit strong {
+  color: var(--brand);
+}
+
+.app-footer-role {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.app-footer-rights {
+  font-size: 0.8rem;
+}
+
+.app-footer--sticky {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  padding: 0.75rem 1.5rem;
+  border-top: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px);
+}
+
+@media (min-width: 640px) {
+  .app-footer--sticky {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    column-gap: 1.5rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .app-footer--sticky {
+    padding: 0.65rem 1rem;
+    background: #fff;
+  }
 }
 
 .card {
@@ -431,6 +519,7 @@ tbody tr:hover {
 .login-page {
   min-height: 100vh;
   display: grid;
+  grid-template-rows: 1fr auto;
   place-items: center;
   padding: 1.5rem;
 }
@@ -879,7 +968,9 @@ tbody tr:hover {
 
 .auth-form-panel {
   display: grid;
+  grid-template-rows: 1fr auto;
   place-items: center;
+  gap: 1.5rem;
   padding: 2rem 1.5rem;
   background:
     radial-gradient(circle at top, rgba(11, 95, 107, 0.08), transparent 55%),
@@ -906,12 +997,14 @@ tbody tr:hover {
   .btn,
   .nav a,
   .kpi-card,
-  .chart-card {
+  .chart-card,
+  .app-footer-link {
     transition: none;
   }
 
   .kpi-card:hover,
-  .chart-card:hover {
+  .chart-card:hover,
+  .app-footer-link:hover {
     transform: none;
   }
 }

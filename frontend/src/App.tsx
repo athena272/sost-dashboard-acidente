@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
+import { AppFooter } from "./components/layout/AppFooter";
 import { AppHeader } from "./components/layout/AppHeader";
 import { api } from "./lib/api";
 import { useAuth } from "./features/auth/AuthContext";
@@ -59,6 +60,7 @@ function ProtectedLayout() {
     return (
       <div className="login-page">
         <p className="muted">Carregando…</p>
+        <AppFooter />
       </div>
     );
   }
@@ -77,6 +79,7 @@ function ProtectedLayout() {
       <main className="content">
         <Outlet />
       </main>
+      <AppFooter className="app-footer--sticky" />
     </div>
   );
 }
