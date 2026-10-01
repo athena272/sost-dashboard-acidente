@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { acronymLabel } from '@sost/shared';
 import { BrandMark } from '../../components/brand/BrandMark';
+import { AppFooter } from '../../components/layout/AppFooter';
 
 export function AuthLayout({ children }: { children: ReactNode }) {
   return (
@@ -22,7 +23,10 @@ export function AuthLayout({ children }: { children: ReactNode }) {
           </p>
         </div>
       </aside>
-      <div className="auth-form-panel">{children}</div>
+      <div className="auth-form-panel">
+        {children}
+        <AppFooter />
+      </div>
     </div>
   );
 }
