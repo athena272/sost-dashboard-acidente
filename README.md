@@ -173,5 +173,4 @@ spreadsheet/     Planilha fonte do seed
 - No dashboard, “Como chegamos nisto” mostra a trilha de cálculo, os buckets da API e os registros brutos que compõem cada métrica.
 
 ## Licença
-
 Software proprietário, com todos os direitos reservados. Uso, cópia, modificação, distribuição ou exploração comercial dependem de autorização por escrito do titular. Os termos completos estão em [LICENSE](LICENSE).

@@ -3,17 +3,27 @@ import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
 import { AppFooter } from "./components/layout/AppFooter";
 import { AppHeader } from "./components/layout/AppHeader";
+import { LazyRouteBoundary } from "./components/routing/LazyRouteBoundary";
+import { lazyPage } from "./components/routing/lazyPage";
 import { api } from "./lib/api";
 import { useAuth } from "./features/auth/AuthContext";
 import { LoginPage } from "./features/auth/LoginPage";
 import { RegisterPage } from "./features/auth/RegisterPage";
-import { AccidentsPage } from "./features/accidents/AccidentsPage";
-import { AccidentFormPage } from "./features/accidents/AccidentFormPage";
-import { DashboardPage } from "./features/dashboard/DashboardPage";
-import { ProfilePage } from "./features/users/ProfilePage";
-import { UsersPage } from "./features/users/UsersPage";
-import { AdminRequestsPage } from "./features/admin/AdminRequestsPage";
-import { ActivityPage } from "./features/admin/ActivityPage";
+
+/** Telas autenticadas: cada uma vira um arquivo próprio, renderizado sob o `LazyRouteBoundary` do `ProtectedLayout`. */
+const DashboardPage = lazyPage(() => import("./features/dashboard/DashboardPage"), "DashboardPage");
+const AccidentsPage = lazyPage(() => import("./features/accidents/AccidentsPage"), "AccidentsPage");
+const AccidentFormPage = lazyPage(
+  () => import("./features/accidents/AccidentFormPage"),
+  "AccidentFormPage",
+);
+const ProfilePage = lazyPage(() => import("./features/users/ProfilePage"), "ProfilePage");
+const UsersPage = lazyPage(() => import("./features/users/UsersPage"), "UsersPage");
+const AdminRequestsPage = lazyPage(
+  () => import("./features/admin/AdminRequestsPage"),
+  "AdminRequestsPage",
+);
+const ActivityPage = lazyPage(() => import("./features/admin/ActivityPage"), "ActivityPage");
 
 function AdminRoute({ children }: { children: ReactNode }) {
   const { isAdmin, loading } = useAuth();
@@ -77,7 +87,9 @@ function ProtectedLayout() {
         onLogout={logout}
       />
       <main className="content">
-        <Outlet />
+        <LazyRouteBoundary>
+          <Outlet />
+        </LazyRouteBoundary>
       </main>
       <AppFooter className="app-footer--sticky" />
     </div>

@@ -2,8 +2,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { UserRole } from '@sost/shared';
+import { acronymLabel, ROLE_LABELS, UserRole } from '@sost/shared';
 import { App } from './App';
+import { ROUTE_LOADING_MESSAGE } from './components/routing/LazyRouteBoundary';
 import { useAuth } from './features/auth/AuthContext';
 
 vi.mock('@vercel/analytics/react', () => ({ Analytics: () => null }));
@@ -24,6 +25,26 @@ const VIEWER: NonNullable<AuthValue['user']> = {
   role: UserRole.Viewer,
 };
 
+const EDITOR: NonNullable<AuthValue['user']> = {
+  id: 'u2',
+  username: 'editor_sost',
+  role: UserRole.Editor,
+};
+
+const ADMIN: NonNullable<AuthValue['user']> = {
+  id: 'u3',
+  username: 'admin_sost',
+  role: UserRole.Admin,
+};
+
+const VIEWER_AUTH: Partial<AuthValue> = { user: VIEWER };
+const EDITOR_AUTH: Partial<AuthValue> = { user: EDITOR, canWriteAccidents: true };
+const ADMIN_AUTH: Partial<AuthValue> = {
+  user: ADMIN,
+  canWriteAccidents: true,
+  isAdmin: true,
+};
+
 function mockAuth(overrides: Partial<AuthValue>) {
   vi.mocked(useAuth).mockReturnValue({
     user: null,
@@ -37,6 +58,9 @@ function mockAuth(overrides: Partial<AuthValue>) {
     ...overrides,
   });
 }
+
+/** First import of a lazy page makes Vitest transform its module tree (e.g. recharts), which can exceed the 1s default. */
+const LAZY_PAGE_TIMEOUT = { timeout: 10_000 };
 
 function renderAt(path: string) {
   render(
@@ -102,4 +126,71 @@ describe('App developer footer', () => {
       expect(footer.classList.contains('app-footer--sticky')).toBe(true);
     },
   );
+});
+
+describe('App lazy-loaded authenticated pages', { timeout: 15_000 }, () => {
+  it.each([
+    ['/', `Dashboard — ${acronymLabel('SOST')}`, VIEWER_AUTH],
+    ['/accidents', `Registros de ${acronymLabel('CAT')}`, VIEWER_AUTH],
+    ['/accidents/new', `Novo registro de ${acronymLabel('CAT')}`, EDITOR_AUTH],
+    ['/profile', 'Meu perfil', VIEWER_AUTH],
+    ['/users', 'Usuários', ADMIN_AUTH],
+    ['/admin/requests', `Pedidos de ${ROLE_LABELS[UserRole.Editor]}`, ADMIN_AUTH],
+    ['/activity', 'Histórico de atividades', ADMIN_AUTH],
+  ])('%s opens its own page instead of staying on the loader', async (path, title, auth) => {
+    mockAuth(auth);
+    renderAt(path);
+
+    expect(
+      await screen.findByRole('heading', { level: 1, name: title }, LAZY_PAGE_TIMEOUT),
+    ).toBeTruthy();
+    expect(screen.queryByText(ROUTE_LOADING_MESSAGE)).toBeNull();
+    expect(screen.getByRole('banner')).toBeTruthy();
+  });
+
+  it('opens the accident detail page, which then shows its own data loading state', async () => {
+    mockAuth(VIEWER_AUTH);
+    renderAt('/accidents/abc123');
+
+    expect(await screen.findByText('Carregando…', {}, LAZY_PAGE_TIMEOUT)).toBeTruthy();
+    expect(screen.queryByText(ROUTE_LOADING_MESSAGE)).toBeNull();
+  });
+
+  it('redirects a viewer away from the new accident form', async () => {
+    mockAuth(VIEWER_AUTH);
+    renderAt('/accidents/new');
+
+    expect(
+      await screen.findByRole(
+        'heading',
+        { level: 1, name: `Registros de ${acronymLabel('CAT')}` },
+        LAZY_PAGE_TIMEOUT,
+      ),
+    ).toBeTruthy();
+  });
+
+  it('redirects a non-admin away from admin pages', async () => {
+    mockAuth(EDITOR_AUTH);
+    renderAt('/users');
+
+    expect(
+      await screen.findByRole(
+        'heading',
+        { level: 1, name: `Dashboard — ${acronymLabel('SOST')}` },
+        LAZY_PAGE_TIMEOUT,
+      ),
+    ).toBeTruthy();
+    expect(screen.queryByRole('heading', { name: 'Usuários' })).toBeNull();
+  });
+
+  it('redirects to login without a session, rendering neither the page nor the loader', () => {
+    mockAuth({});
+    renderAt('/accidents');
+
+    expect(screen.getByRole('heading', { name: 'Entrar' })).toBeTruthy();
+    expect(screen.queryByText(ROUTE_LOADING_MESSAGE)).toBeNull();
+    expect(
+      screen.queryByRole('heading', { name: `Registros de ${acronymLabel('CAT')}` }),
+    ).toBeNull();
+  });
 });
