@@ -40,12 +40,22 @@ describe('formatRightsNotice', () => {
 });
 
 describe('DEVELOPER_CONTACTS', () => {
-  it('lists WhatsApp, LinkedIn and GitHub in this order', () => {
+  it('lists WhatsApp, LinkedIn, GitHub and Portfolio in this order', () => {
     expect(DEVELOPER_CONTACTS.map((contact) => contact.id)).toEqual([
       'whatsapp',
       'linkedin',
       'github',
+      'portfolio',
     ]);
+  });
+
+  it('links the portfolio from the profile URL', () => {
+    const portfolio = DEVELOPER_CONTACTS.find(
+      (contact) => contact.id === 'portfolio',
+    );
+
+    expect(portfolio?.href).toBe(DEVELOPER_PROFILE.portfolioUrl);
+    expect(portfolio?.href).toBe('https://athena272portfolio.vercel.app');
   });
 
   it('derives the WhatsApp link from the profile phone', () => {
@@ -66,6 +76,7 @@ describe('DEVELOPER_CONTACTS', () => {
       whatsapp: '#25D366',
       linkedin: '#0A66C2',
       github: 'var(--ink)',
+      portfolio: '#7C3AED',
     });
   });
 });

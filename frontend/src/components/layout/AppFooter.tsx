@@ -1,3 +1,4 @@
+import { Globe } from 'lucide-react';
 import type { ComponentType } from 'react';
 import {
   GitHubIcon,
@@ -19,6 +20,7 @@ const CONTACT_ICONS: Record<DeveloperContactId, ComponentType<BrandIconProps>> =
     whatsapp: WhatsAppIcon,
     linkedin: LinkedInIcon,
     github: GitHubIcon,
+    portfolio: Globe,
   };
 
 type AppFooterProps = {

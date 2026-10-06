@@ -20,6 +20,10 @@ const EXPECTED_LINKS = [
     name: 'GitHub (abre em nova aba)',
     href: 'https://github.com/athena272',
   },
+  {
+    name: 'Portfólio (abre em nova aba)',
+    href: 'https://athena272portfolio.vercel.app',
+  },
 ];
 
 describe('AppFooter', () => {
