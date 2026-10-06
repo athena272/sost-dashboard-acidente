@@ -4,6 +4,7 @@ import { cleanup, render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { acronymLabel, ROLE_LABELS, UserRole } from '@sost/shared';
 import { App } from './App';
+import { DEVELOPER_CONTACTS } from './components/layout/developerProfile';
 import { ROUTE_LOADING_MESSAGE } from './components/routing/LazyRouteBoundary';
 import { useAuth } from './features/auth/AuthContext';
 
@@ -76,7 +77,9 @@ function expectDeveloperFooter() {
     name: 'Contato do desenvolvedor',
   });
 
-  expect(within(nav).getAllByRole('link')).toHaveLength(3);
+  expect(within(nav).getAllByRole('link')).toHaveLength(
+    DEVELOPER_CONTACTS.length,
+  );
   expect(within(footer).getByText('Guilherme R. Alves')).toBeTruthy();
   return footer;
 }
