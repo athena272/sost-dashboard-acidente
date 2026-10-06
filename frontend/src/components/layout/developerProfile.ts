@@ -5,9 +5,10 @@ export const DEVELOPER_PROFILE = {
   phoneCountryCode: '55',
   linkedinUrl: 'https://www.linkedin.com/in/guigorosario/',
   githubUrl: 'https://github.com/athena272',
+  portfolioUrl: 'https://athena272portfolio.vercel.app',
 } as const;
 
-export type DeveloperContactId = 'whatsapp' | 'linkedin' | 'github';
+export type DeveloperContactId = 'whatsapp' | 'linkedin' | 'github' | 'portfolio';
 
 export type DeveloperContact = {
   id: DeveloperContactId;
@@ -55,5 +56,11 @@ export const DEVELOPER_CONTACTS: readonly DeveloperContact[] = [
     href: DEVELOPER_PROFILE.githubUrl,
     // Follows the main text color so the mark stays visible on any theme.
     color: 'var(--ink)',
+  },
+  {
+    id: 'portfolio',
+    label: 'Portfólio',
+    href: DEVELOPER_PROFILE.portfolioUrl,
+    color: '#7C3AED',
   },
 ];
