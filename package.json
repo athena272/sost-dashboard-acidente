@@ -13,8 +13,7 @@
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
     "seed": "pnpm --filter @sost/backend seed",
-    "seed:admin": "pnpm --filter @sost/backend seed:admin",
-    "organic:login": "node scripts/organic-login.mjs"
+    "seed:admin": "pnpm --filter @sost/backend seed:admin"
   },
   "engines": {
     "node": ">=24"
