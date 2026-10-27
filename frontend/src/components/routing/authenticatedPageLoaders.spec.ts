@@ -29,7 +29,9 @@ describe('authenticatedPageLoaders', () => {
 describe('preloadAuthenticatedPage', () => {
   it('loads a known path once when called repeatedly', async () => {
     const load = vi.fn(() => Promise.resolve({ AccidentsPage: () => null }));
-    vi.spyOn(authenticatedPageLoaders, '/accidents').mockImplementation(load);
+    vi.spyOn(authenticatedPageLoaders, '/accidents').mockImplementation(
+      load as unknown as (typeof authenticatedPageLoaders)['/accidents'],
+    );
 
     preloadAuthenticatedPage('/accidents');
     preloadAuthenticatedPage('/accidents');
@@ -40,7 +42,9 @@ describe('preloadAuthenticatedPage', () => {
 
   it('ignores unknown paths', () => {
     const load = vi.fn(() => Promise.resolve({}));
-    vi.spyOn(authenticatedPageLoaders, '/').mockImplementation(load);
+    vi.spyOn(authenticatedPageLoaders, '/').mockImplementation(
+      load as unknown as (typeof authenticatedPageLoaders)['/'],
+    );
 
     preloadAuthenticatedPage('/not-a-route');
 
@@ -52,7 +56,9 @@ describe('preloadAuthenticatedPage', () => {
       .fn()
       .mockRejectedValueOnce(new Error('chunk failed'))
       .mockResolvedValueOnce({ DashboardPage: () => null });
-    vi.spyOn(authenticatedPageLoaders, '/').mockImplementation(load);
+    vi.spyOn(authenticatedPageLoaders, '/').mockImplementation(
+      load as unknown as (typeof authenticatedPageLoaders)['/'],
+    );
 
     preloadAuthenticatedPage('/');
     await expect(load.mock.results[0]?.value).rejects.toThrow('chunk failed');
