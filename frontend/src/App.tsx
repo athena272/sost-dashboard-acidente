@@ -4,6 +4,10 @@ import { Analytics } from "@vercel/analytics/react";
 import { AppFooter } from "./components/layout/AppFooter";
 import { AppHeader } from "./components/layout/AppHeader";
 import { LazyRouteBoundary } from "./components/routing/LazyRouteBoundary";
+import {
+  authenticatedPageLoaders,
+  preloadAuthenticatedPage,
+} from "./components/routing/authenticatedPageLoaders";
 import { lazyPage } from "./components/routing/lazyPage";
 import { api } from "./lib/api";
 import { useAuth } from "./features/auth/AuthContext";
@@ -11,19 +15,19 @@ import { LoginPage } from "./features/auth/LoginPage";
 import { RegisterPage } from "./features/auth/RegisterPage";
 
 /** Telas autenticadas: cada uma vira um arquivo próprio, renderizado sob o `LazyRouteBoundary` do `ProtectedLayout`. */
-const DashboardPage = lazyPage(() => import("./features/dashboard/DashboardPage"), "DashboardPage");
-const AccidentsPage = lazyPage(() => import("./features/accidents/AccidentsPage"), "AccidentsPage");
+const DashboardPage = lazyPage(authenticatedPageLoaders["/"], "DashboardPage");
+const AccidentsPage = lazyPage(authenticatedPageLoaders["/accidents"], "AccidentsPage");
 const AccidentFormPage = lazyPage(
-  () => import("./features/accidents/AccidentFormPage"),
+  authenticatedPageLoaders["/accidents/new"],
   "AccidentFormPage",
 );
-const ProfilePage = lazyPage(() => import("./features/users/ProfilePage"), "ProfilePage");
-const UsersPage = lazyPage(() => import("./features/users/UsersPage"), "UsersPage");
+const ProfilePage = lazyPage(authenticatedPageLoaders["/profile"], "ProfilePage");
+const UsersPage = lazyPage(authenticatedPageLoaders["/users"], "UsersPage");
 const AdminRequestsPage = lazyPage(
-  () => import("./features/admin/AdminRequestsPage"),
+  authenticatedPageLoaders["/admin/requests"],
   "AdminRequestsPage",
 );
-const ActivityPage = lazyPage(() => import("./features/admin/ActivityPage"), "ActivityPage");
+const ActivityPage = lazyPage(authenticatedPageLoaders["/activity"], "ActivityPage");
 
 function AdminRoute({ children }: { children: ReactNode }) {
   const { isAdmin, loading } = useAuth();
@@ -42,6 +46,10 @@ function WriteRoute({ children }: { children: ReactNode }) {
 function ProtectedLayout() {
   const { user, loading, logout, canWriteAccidents, isAdmin } = useAuth();
   const [pendingRequests, setPendingRequests] = useState(0);
+
+  useEffect(() => {
+    preloadAuthenticatedPage("/");
+  }, []);
 
   useEffect(() => {
     if (!isAdmin) {

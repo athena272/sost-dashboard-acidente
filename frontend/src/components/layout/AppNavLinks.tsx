@@ -9,6 +9,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
+import { preloadAuthenticatedPage } from '../routing/authenticatedPageLoaders';
 import { getNavItems, type NavItemId } from './navItems';
 
 const NAV_ICONS: Record<NavItemId, LucideIcon> = {
@@ -47,6 +48,8 @@ export function AppNavLinks({
             end={item.end}
             className={item.showBadge ? 'nav-with-badge' : undefined}
             onClick={onNavigate}
+            onMouseEnter={() => preloadAuthenticatedPage(item.to)}
+            onFocus={() => preloadAuthenticatedPage(item.to)}
           >
             <Icon size={16} strokeWidth={2} aria-hidden />
             {item.label}
